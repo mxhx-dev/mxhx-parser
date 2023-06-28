@@ -1,0 +1,89 @@
+{
+	doc: null
+	fields: [{
+		access: [APublic]
+		doc: null
+		kind: FFun({
+			args: []
+			expr: {
+				expr: EBlock([{
+					expr: ECall({
+						expr: EConst(CIdent(super))
+						pos: #pos
+					}, [])
+					pos: #pos
+				}, {
+					expr: ECall({
+						expr: EField({
+							expr: EConst(CIdent(this))
+							pos: #pos
+						}, MXHXComponent_initMXHX)
+						pos: #pos
+					}, [])
+					pos: #pos
+				}])
+				pos: #pos
+			}
+			params: null
+			ret: TPath({
+				name: Void
+				pack: []
+				params: []
+				sub: null
+			})
+		})
+		meta: null
+		name: new
+		pos: #pos
+	}, {
+		access: [APrivate]
+		doc: null
+		kind: FFun({
+			args: []
+			expr: {
+				expr: EBlock([{
+					expr: EBinop(OpAssign, {
+						expr: EField({
+							expr: EConst(CIdent(this))
+							pos: #pos
+						}, string)
+						pos: #pos
+					}, {
+						expr: null <- expected value
+						pos: null <- expected value
+					})
+					pos: #pos
+				}])
+				pos: #pos
+			}
+			params: null
+			ret: TPath({
+				name: Void
+				pack: []
+				params: []
+				sub: null
+			})
+		})
+		meta: [{
+			name: :noCompletion
+			params: null
+			pos: #pos
+		}]
+		name: MXHXComponent_initMXHX
+		pos: #pos
+	}]
+	isExtern: false
+	kind: TDClass({
+		name: TestPropertiesClass
+		pack: [fixtures]
+		params: null
+		sub: null
+	}, [], false, false, false)
+	meta: []
+	name: MXHXComponent_InlineMarkup_54
+	pack: []
+	params: []
+	pos: #pos
+}
+line 52: expected value
+line 53: expected value

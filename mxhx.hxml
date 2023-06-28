@@ -1,0 +1,4 @@
+--interp
+-cp src
+-lib hxparse
+--main Main
