@@ -22,6 +22,7 @@ class Main {
 		runner.addCase(new mxhx.macros.MXHXComponentBindingTest());
 		runner.addCase(new mxhx.macros.MXHXComponentBuildMacroTest());
 		runner.addCase(new mxhx.macros.MXHXComponentWithFileTest());
+		runner.addCase(new mxhx.macros.MXHXComponentInlineComponentTest());
 
 		#if (html5 && playwright)
 		// special case: see below for details
