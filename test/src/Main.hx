@@ -17,13 +17,6 @@ class Main {
 		runner.addCase(new mxhx.parser.MXHXParserTagTest());
 		runner.addCase(new mxhx.parser.MXHXParserTagAttributeTest());
 
-		runner.addCase(new mxhx.macros.MXHXComponentDeclarationsTest());
-		runner.addCase(new mxhx.macros.MXHXComponentPropertyTest());
-		runner.addCase(new mxhx.macros.MXHXComponentBindingTest());
-		runner.addCase(new mxhx.macros.MXHXComponentBuildMacroTest());
-		runner.addCase(new mxhx.macros.MXHXComponentWithFileTest());
-		runner.addCase(new mxhx.macros.MXHXComponentInlineComponentTest());
-
 		#if (html5 && playwright)
 		// special case: see below for details
 		setupHeadlessMode(runner);

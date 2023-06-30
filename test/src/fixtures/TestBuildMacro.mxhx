@@ -1,5 +1,0 @@
-<tests:TestClass1 xmlns:mx="https://ns.mxhx.dev/2022/basic" xmlns:tests="https://ns.mxhx.dev/2022/tests">
-	<mx:Declarations>
-		<mx:Float id="float">123.4</mx:Float>
-	</mx:Declarations>
-</tests:TestClass1>
