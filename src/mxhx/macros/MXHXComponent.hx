@@ -72,6 +72,7 @@ class MXHXComponent {
 		LANGUAGE_URI_FULL_2022,
 		// @:formatter:on
 	];
+	private static final PACKAGE_RESERVED = ["mxhx", "_reserved"];
 	private static final PROPERTY_ID = "id";
 	private static final PROPERTY_TYPE = "type";
 	private static final PROPERTY_XMLNS = "xmlns";
@@ -218,7 +219,8 @@ class MXHXComponent {
 		}
 
 		var buildFields = Context.getBuildFields();
-		handleRootTag(mxhxData.rootTag, INIT_FUNCTION_NAME, localClass.name, buildFields);
+		var localTypePath = {name: localClass.name, pack: localClass.pack};
+		handleRootTag(mxhxData.rootTag, INIT_FUNCTION_NAME, localTypePath, buildFields);
 		return buildFields;
 	}
 
@@ -228,7 +230,7 @@ class MXHXComponent {
 		Calling `withFile()` multiple times will re-use the same generated
 		class each time.
 	**/
-	public macro static function withFile(filePath:String):Expr {
+	public macro static function withFile(filePath:String, ?typePath:TypePath):Expr {
 		filePath = resolveFilePath(filePath);
 		var typeDef:TypeDefinition = null;
 		if (FILE_PATH_TO_TYPE_DEFINITION.exists(filePath)) {
@@ -237,9 +239,13 @@ class MXHXComponent {
 		}
 		if (typeDef == null) {
 			var mxhxText = loadMXHXFile(filePath);
-			var componentName = Path.withoutExtension(Path.withoutDirectory(filePath));
+			if (typePath == null) {
+				var name = 'MXHXComponent_${componentCounter}';
+				componentCounter++;
+				typePath = {name: name, pack: PACKAGE_RESERVED};
+			}
 			createResolver();
-			typeDef = createTypeDefinitionFromString(mxhxText, componentName);
+			typeDef = createTypeDefinitionFromString(mxhxText, typePath);
 			mxhxResolver = null;
 			FILE_PATH_TO_TYPE_DEFINITION.set(filePath, typeDef);
 		}
@@ -247,14 +253,13 @@ class MXHXComponent {
 			return macro null;
 		}
 		Context.defineType(typeDef);
-		var typePath = {name: typeDef.name, pack: typeDef.pack};
 		return macro new $typePath();
 	}
 
 	/**
 		Instantiates a component from markup.
 	**/
-	public macro static function withMarkup(input:ExprOf<String>):Expr {
+	public macro static function withMarkup(input:ExprOf<String>, ?typePath:TypePath):Expr {
 		posInfos = PositionTools.getInfos(input.pos);
 		// skip the quotes
 		posInfos.min++;
@@ -268,16 +273,18 @@ class MXHXComponent {
 			case _:
 				throw new haxe.macro.Expr.Error("Expected markup or string literal", input.pos);
 		}
-		var componentName = 'MXHXComponent_InlineMarkup_${componentCounter}';
-		componentCounter++;
+		if (typePath == null) {
+			var name = 'MXHXComponent_${componentCounter}';
+			componentCounter++;
+			typePath = {name: name, pack: PACKAGE_RESERVED};
+		}
 		createResolver();
-		var typeDef = createTypeDefinitionFromString(mxhxText, componentName);
+		var typeDef = createTypeDefinitionFromString(mxhxText, typePath);
 		mxhxResolver = null;
 		if (typeDef == null) {
 			return macro null;
 		}
 		Context.defineType(typeDef);
-		var typePath = {name: typeDef.name, pack: typeDef.pack};
 		return macro new $typePath();
 	}
 
@@ -324,7 +331,7 @@ class MXHXComponent {
 		}
 	}
 
-	private static function createTypeDefinitionFromString(mxhxText:String, componentName:String):TypeDefinition {
+	private static function createTypeDefinitionFromString(mxhxText:String, typePath:TypePath):TypeDefinition {
 		var mxhxParser = new MXHXParser(mxhxText, posInfos.file);
 		var mxhxData = mxhxParser.parse();
 		if (mxhxData.problems.length > 0) {
@@ -333,16 +340,16 @@ class MXHXComponent {
 			}
 			return null;
 		}
-		var typeDef:TypeDefinition = createTypeDefinitionFromTagData(mxhxData.rootTag, componentName);
+		var typeDef:TypeDefinition = createTypeDefinitionFromTagData(mxhxData.rootTag, typePath);
 		if (typeDef == null) {
 			return null;
 		}
 		return typeDef;
 	}
 
-	private static function createTypeDefinitionFromTagData(rootTag:IMXHXTagData, componentName:String):TypeDefinition {
+	private static function createTypeDefinitionFromTagData(rootTag:IMXHXTagData, typePath:TypePath):TypeDefinition {
 		var buildFields:Array<Field> = [];
-		var resolvedTag = handleRootTag(rootTag, INIT_FUNCTION_NAME, componentName, buildFields);
+		var resolvedTag = handleRootTag(rootTag, INIT_FUNCTION_NAME, typePath, buildFields);
 
 		var resolvedType:BaseType = null;
 		var resolvedClass:ClassType = null;
@@ -363,6 +370,7 @@ class MXHXComponent {
 			}
 		}
 
+		var componentName = typePath.name;
 		var typeDef:TypeDefinition = null;
 		if (resolvedClass != null) {
 			var superClassTypePath = {name: resolvedClass.name, pack: resolvedClass.pack};
@@ -378,7 +386,7 @@ class MXHXComponent {
 			typeDef.fields.push(buildField);
 		}
 		var typePos = sourceLocationToContextPosition(rootTag);
-		typeDef.pack = ["mxhx", "_reserved"];
+		typeDef.pack = typePath.pack;
 		typeDef.pos = typePos;
 		typeDef.meta = [
 			{
@@ -390,7 +398,7 @@ class MXHXComponent {
 		return typeDef;
 	}
 
-	private static function handleRootTag(tagData:IMXHXTagData, initFunctionName:String, outerDocumentType:String, buildFields:Array<Field>):MXHXSymbol {
+	private static function handleRootTag(tagData:IMXHXTagData, initFunctionName:String, outerDocumentTypePath:TypePath, buildFields:Array<Field>):MXHXSymbol {
 		objectCounter = 0;
 		var prefixMap = tagData.parent.getPrefixMapForTag(tagData);
 		var languageUris:Array<String> = [];
@@ -430,7 +438,7 @@ class MXHXComponent {
 		var bodyExprs:Array<Expr> = [];
 		var attributeAndChildNames:Map<String, Bool> = [];
 		handleAttributesOfInstanceTag(tagData, resolvedTag, KEYWORD_THIS, bodyExprs, attributeAndChildNames);
-		handleChildUnitsOfInstanceTag(tagData, resolvedTag, KEYWORD_THIS, outerDocumentType, generatedFields, bodyExprs, attributeAndChildNames);
+		handleChildUnitsOfInstanceTag(tagData, resolvedTag, KEYWORD_THIS, outerDocumentTypePath, generatedFields, bodyExprs, attributeAndChildNames);
 		var constructorExprs:Array<Expr> = [];
 		constructorExprs.push(macro this.$initFunctionName());
 		var fieldPos = sourceLocationToContextPosition(tagData);
@@ -663,11 +671,12 @@ class MXHXComponent {
 		return macro Xml.parse($v{xmlString});
 	}
 
-	private static function handleComponentTag(tagData:IMXHXTagData, assignedToType:Type, outerDocumentType:String, generatedFields:Array<Field>):Expr {
-		var componentName = '${outerDocumentType}_InlineComponent_${componentCounter}';
+	private static function handleComponentTag(tagData:IMXHXTagData, assignedToType:Type, outerDocumentTypePath:TypePath, generatedFields:Array<Field>):Expr {
+		var componentName = 'MXHXComponent_${componentCounter}';
 		var functionName = 'createMXHXInlineComponent_${componentCounter}';
 		componentCounter++;
-		var typeDef = createTypeDefinitionFromTagData(tagData.getFirstChildTag(true), componentName);
+		var typePath = {name: componentName, pack: PACKAGE_RESERVED};
+		var typeDef = createTypeDefinitionFromTagData(tagData.getFirstChildTag(true), typePath);
 		if (typeDef == null) {
 			return macro null;
 		}
@@ -676,7 +685,7 @@ class MXHXComponent {
 		typeDef.fields.push({
 			name: "outerDocument",
 			pos: typePos,
-			kind: FVar(TPath({name: outerDocumentType, pack: []})),
+			kind: FVar(TPath(outerDocumentTypePath)),
 			access: [APublic],
 			meta: [
 				{
@@ -689,7 +698,7 @@ class MXHXComponent {
 		typeDef.fields.push({
 			name: staticOuterDocumentFieldName,
 			pos: typePos,
-			kind: FVar(TPath({name: outerDocumentType, pack: []})),
+			kind: FVar(TPath(outerDocumentTypePath)),
 			access: [APublic, AStatic],
 			meta: [
 				{
@@ -741,7 +750,7 @@ class MXHXComponent {
 		return macro $i{functionName}();
 	}
 
-	private static function handleInstanceTag(tagData:IMXHXTagData, assignedToType:Type, outerDocumentType:String, generatedFields:Array<Field>):Expr {
+	private static function handleInstanceTag(tagData:IMXHXTagData, assignedToType:Type, outerDocumentTypePath:TypePath, generatedFields:Array<Field>):Expr {
 		var resolvedTag = mxhxResolver.resolveTag(tagData);
 		if (resolvedTag == null) {
 			errorTagUnexpected(tagData);
@@ -783,7 +792,7 @@ class MXHXComponent {
 						default:
 							errorTagUnexpected(tagData);
 					}
-					return createInitExpr(tagData.parentTag, resolvedType, resolvedEnum, outerDocumentType, generatedFields);
+					return createInitExpr(tagData.parentTag, resolvedType, resolvedEnum, outerDocumentTypePath, generatedFields);
 				default:
 					errorTagUnexpected(tagData);
 			}
@@ -793,7 +802,7 @@ class MXHXComponent {
 		var setFieldExprs:Array<Expr> = [];
 		var attributeAndChildNames:Map<String, Bool> = [];
 		handleAttributesOfInstanceTag(tagData, resolvedTag, localVarName, setFieldExprs, attributeAndChildNames);
-		handleChildUnitsOfInstanceTag(tagData, resolvedTag, localVarName, outerDocumentType, generatedFields, setFieldExprs, attributeAndChildNames);
+		handleChildUnitsOfInstanceTag(tagData, resolvedTag, localVarName, outerDocumentTypePath, generatedFields, setFieldExprs, attributeAndChildNames);
 
 		var childTypePath:TypePath = null;
 		if (resolvedType == null) {
@@ -966,7 +975,7 @@ class MXHXComponent {
 		return initExpr;
 	}
 
-	private static function createEnumFieldInitExpr(tagData:IMXHXTagData, outerDocumentType:String, generatedFields:Array<Field>):Expr {
+	private static function createEnumFieldInitExpr(tagData:IMXHXTagData, outerDocumentTypePath:TypePath, generatedFields:Array<Field>):Expr {
 		var child = tagData.getFirstChildUnit();
 		var childTag:IMXHXTagData = null;
 		do {
@@ -1033,7 +1042,7 @@ class MXHXComponent {
 							} else if (tagLookup.exists(argName)) {
 								var grandChildTag = tagLookup.get(argName);
 								tagLookup.remove(argName);
-								var valueExpr = createValueExprForFieldTag(grandChildTag, null, null, arg.t, outerDocumentType, generatedFields);
+								var valueExpr = createValueExprForFieldTag(grandChildTag, null, null, arg.t, outerDocumentTypePath, generatedFields);
 								initArgs.push(valueExpr);
 							} else if (arg.opt) {
 								initArgs.push(macro null);
@@ -1163,16 +1172,16 @@ class MXHXComponent {
 		return text;
 	}
 
-	private static function handleChildUnitsOfDeclarationsTag(tagData:IMXHXTagData, outerDocumentType:String, generatedFields:Array<Field>,
+	private static function handleChildUnitsOfDeclarationsTag(tagData:IMXHXTagData, outerDocumentTypePath:TypePath, generatedFields:Array<Field>,
 			initExprs:Array<Expr>):Void {
 		var current = tagData.getFirstChildUnit();
 		while (current != null) {
-			handleChildUnitOfArrayOrDeclarationsTag(current, outerDocumentType, generatedFields, initExprs);
+			handleChildUnitOfArrayOrDeclarationsTag(current, outerDocumentTypePath, generatedFields, initExprs);
 			current = current.getNextSiblingUnit();
 		}
 	}
 
-	private static function createInitExpr(tagData:IMXHXTagData, t:BaseType, e:EnumType, outerDocumentType:String, generatedFields:Array<Field>):Expr {
+	private static function createInitExpr(tagData:IMXHXTagData, t:BaseType, e:EnumType, outerDocumentTypePath:TypePath, generatedFields:Array<Field>):Expr {
 		var initExpr:Expr = null;
 		if (t.pack.length == 0 && t.name == TYPE_XML) {
 			initExpr = handleXmlTag(tagData, generatedFields);
@@ -1185,7 +1194,7 @@ class MXHXComponent {
 		} else if (isLanguageTypeAssignableFromText(t)) {
 			initExpr = handleInstanceTagAssignableFromText(tagData, t, e, generatedFields);
 		} else {
-			initExpr = handleInstanceTag(tagData, null, outerDocumentType, generatedFields);
+			initExpr = handleInstanceTag(tagData, null, outerDocumentTypePath, generatedFields);
 		}
 		var id = tagData.getRawAttributeValue(PROPERTY_ID);
 		if (id != null) {
@@ -1194,7 +1203,7 @@ class MXHXComponent {
 		return initExpr;
 	}
 
-	private static function handleChildUnitOfArrayOrDeclarationsTag(unitData:IMXHXUnitData, outerDocumentType:String, generatedFields:Array<Field>,
+	private static function handleChildUnitOfArrayOrDeclarationsTag(unitData:IMXHXUnitData, outerDocumentTypePath:TypePath, generatedFields:Array<Field>,
 			initExprs:Array<Expr>):Void {
 		if ((unitData is IMXHXInstructionData)) {
 			// safe to ignore
@@ -1227,15 +1236,15 @@ class MXHXComponent {
 		} else {
 			switch (resolvedTag) {
 				case ClassSymbol(c, params):
-					var initExpr = createInitExpr(tagData, c, null, outerDocumentType, generatedFields);
+					var initExpr = createInitExpr(tagData, c, null, outerDocumentTypePath, generatedFields);
 					initExprs.push(initExpr);
 					return;
 				case AbstractSymbol(a, params):
-					var initExpr = createInitExpr(tagData, a, null, outerDocumentType, generatedFields);
+					var initExpr = createInitExpr(tagData, a, null, outerDocumentTypePath, generatedFields);
 					initExprs.push(initExpr);
 					return;
 				case EnumSymbol(e, params):
-					var initExpr = createInitExpr(tagData, e, e, outerDocumentType, generatedFields);
+					var initExpr = createInitExpr(tagData, e, e, outerDocumentTypePath, generatedFields);
 					initExprs.push(initExpr);
 					return;
 				default:
@@ -1245,8 +1254,8 @@ class MXHXComponent {
 		}
 	}
 
-	private static function handleChildUnitsOfInstanceTag(tagData:IMXHXTagData, parentSymbol:MXHXSymbol, targetIdentifier:String, outerDocumentType:String,
-			generatedFields:Array<Field>, initExprs:Array<Expr>, attributeAndChildNames:Map<String, Bool>):Void {
+	private static function handleChildUnitsOfInstanceTag(tagData:IMXHXTagData, parentSymbol:MXHXSymbol, targetIdentifier:String,
+			outerDocumentTypePath:TypePath, generatedFields:Array<Field>, initExprs:Array<Expr>, attributeAndChildNames:Map<String, Bool>):Void {
 		var parentType:BaseType = null;
 		var parentClass:ClassType = null;
 		var parentEnum:EnumType = null;
@@ -1271,7 +1280,7 @@ class MXHXComponent {
 		}
 
 		if (parentEnum != null || isLanguageTypeAssignableFromText(parentType)) {
-			initExprs.push(createInitExpr(tagData, parentType, parentEnum, outerDocumentType, generatedFields));
+			initExprs.push(createInitExpr(tagData, parentType, parentEnum, outerDocumentTypePath, generatedFields));
 			return;
 		}
 
@@ -1289,7 +1298,7 @@ class MXHXComponent {
 			currentClass = superClass.t.get();
 		}
 		if (defaultProperty != null) {
-			handleChildUnitsOfInstanceTagWithDefaultProperty(tagData, parentSymbol, defaultProperty, targetIdentifier, outerDocumentType, generatedFields,
+			handleChildUnitsOfInstanceTagWithDefaultProperty(tagData, parentSymbol, defaultProperty, targetIdentifier, outerDocumentTypePath, generatedFields,
 				initExprs, attributeAndChildNames);
 			return;
 		}
@@ -1297,7 +1306,7 @@ class MXHXComponent {
 		var arrayChildren:Array<IMXHXUnitData> = isArray ? [] : null;
 		var current = tagData.getFirstChildUnit();
 		while (current != null) {
-			handleChildUnitOfInstanceTag(current, parentSymbol, targetIdentifier, outerDocumentType, generatedFields, initExprs, attributeAndChildNames,
+			handleChildUnitOfInstanceTag(current, parentSymbol, targetIdentifier, outerDocumentTypePath, generatedFields, initExprs, attributeAndChildNames,
 				arrayChildren);
 			current = current.getNextSiblingUnit();
 		}
@@ -1307,7 +1316,7 @@ class MXHXComponent {
 
 		var arrayExprs:Array<Expr> = [];
 		for (child in arrayChildren) {
-			handleChildUnitOfArrayOrDeclarationsTag(child, outerDocumentType, generatedFields, arrayExprs);
+			handleChildUnitOfArrayOrDeclarationsTag(child, outerDocumentTypePath, generatedFields, arrayExprs);
 		}
 		for (i in 0...arrayExprs.length) {
 			var arrayExpr = arrayExprs[i];
@@ -1317,12 +1326,12 @@ class MXHXComponent {
 	}
 
 	private static function handleChildUnitsOfInstanceTagWithDefaultProperty(tagData:IMXHXTagData, parentSymbol:MXHXSymbol, defaultProperty:String,
-			targetIdentifier:String, outerDocumentType:String, generatedFields:Array<Field>, initExprs:Array<Expr>,
+			targetIdentifier:String, outerDocumentTypePath:TypePath, generatedFields:Array<Field>, initExprs:Array<Expr>,
 			attributeAndChildNames:Map<String, Bool>):Void {
 		var defaultChildren:Array<IMXHXUnitData> = [];
 		var current = tagData.getFirstChildUnit();
 		while (current != null) {
-			handleChildUnitOfInstanceTag(current, parentSymbol, targetIdentifier, outerDocumentType, generatedFields, initExprs, attributeAndChildNames,
+			handleChildUnitOfInstanceTag(current, parentSymbol, targetIdentifier, outerDocumentTypePath, generatedFields, initExprs, attributeAndChildNames,
 				defaultChildren);
 			current = current.getNextSiblingUnit();
 		}
@@ -1344,7 +1353,7 @@ class MXHXComponent {
 		var fieldName = field.name;
 		attributeAndChildNames.set(fieldName, true);
 
-		var valueExpr = createValueExprForFieldTag(tagData, defaultChildren, field, null, outerDocumentType, generatedFields);
+		var valueExpr = createValueExprForFieldTag(tagData, defaultChildren, field, null, outerDocumentTypePath, generatedFields);
 		var initExpr = macro $i{targetIdentifier}.$fieldName = ${valueExpr};
 		initExprs.push(initExpr);
 	}
@@ -1369,8 +1378,9 @@ class MXHXComponent {
 		return true;
 	}
 
-	private static function handleChildUnitOfInstanceTag(unitData:IMXHXUnitData, parentSymbol:MXHXSymbol, targetIdentifier:String, outerDocumentType:String,
-			generatedFields:Array<Field>, initExprs:Array<Expr>, attributeAndChildNames:Map<String, Bool>, defaultChildren:Array<IMXHXUnitData>):Void {
+	private static function handleChildUnitOfInstanceTag(unitData:IMXHXUnitData, parentSymbol:MXHXSymbol, targetIdentifier:String,
+			outerDocumentTypePath:TypePath, generatedFields:Array<Field>, initExprs:Array<Expr>, attributeAndChildNames:Map<String, Bool>,
+			defaultChildren:Array<IMXHXUnitData>):Void {
 		if ((unitData is IMXHXTagData)) {
 			var tagData:IMXHXTagData = cast unitData;
 			var parentIsRoot = tagData.parentTag == tagData.parent.rootTag;
@@ -1384,7 +1394,7 @@ class MXHXComponent {
 			} else {
 				if (isLanguageTag(TAG_DECLARATIONS, tagData)) {
 					checkForInvalidAttributes(tagData, false);
-					handleChildUnitsOfDeclarationsTag(tagData, outerDocumentType, generatedFields, initExprs);
+					handleChildUnitsOfDeclarationsTag(tagData, outerDocumentTypePath, generatedFields, initExprs);
 					return;
 				}
 			}
@@ -1401,7 +1411,7 @@ class MXHXComponent {
 						return;
 					}
 					var fieldName = tagData.shortName;
-					var valueExpr = createValueExprForFieldTag(tagData, null, null, null, outerDocumentType, generatedFields);
+					var valueExpr = createValueExprForFieldTag(tagData, null, null, null, outerDocumentTypePath, generatedFields);
 					var initExpr = macro $i{targetIdentifier}.$fieldName = ${valueExpr};
 					initExprs.push(initExpr);
 					return;
@@ -1454,7 +1464,7 @@ class MXHXComponent {
 						}
 						checkForInvalidAttributes(tagData, false);
 						var fieldName = f.name;
-						var valueExpr = createValueExprForFieldTag(tagData, null, f, null, outerDocumentType, generatedFields);
+						var valueExpr = createValueExprForFieldTag(tagData, null, f, null, outerDocumentTypePath, generatedFields);
 						var initExpr = macro $i{targetIdentifier}.$fieldName = ${valueExpr};
 						initExprs.push(initExpr);
 						return;
@@ -1505,7 +1515,7 @@ class MXHXComponent {
 	}
 
 	private static function createValueExprForFieldTag(tagData:IMXHXTagData, childUnits:Array<IMXHXUnitData>, field:ClassField, fieldType:Type,
-			outerDocumentType:String, generatedFields:Array<Field>):Expr {
+			outerDocumentTypePath:TypePath, generatedFields:Array<Field>):Expr {
 		var isArray = false;
 		var isString = false;
 		var fieldName:String = tagData.shortName;
@@ -1539,7 +1549,7 @@ class MXHXComponent {
 					return null;
 				}
 			}
-			var valueExpr = createValueExprForUnitData(current, fieldType, outerDocumentType, generatedFields);
+			var valueExpr = createValueExprForUnitData(current, fieldType, outerDocumentTypePath, generatedFields);
 			if (valueExpr != null) {
 				if (valueExprs.length == 0 && (current is IMXHXTagData)) {
 					var tagData:IMXHXTagData = cast current;
@@ -1584,14 +1594,14 @@ class MXHXComponent {
 		return valueExprs[0];
 	}
 
-	private static function createValueExprForUnitData(unitData:IMXHXUnitData, assignedToType:Type, outerDocumentType:String,
+	private static function createValueExprForUnitData(unitData:IMXHXUnitData, assignedToType:Type, outerDocumentTypePath:TypePath,
 			generatedFields:Array<Field>):Expr {
 		if ((unitData is IMXHXTagData)) {
 			var tagData:IMXHXTagData = cast unitData;
 			if (isComponentTag(tagData)) {
-				return handleComponentTag(tagData, assignedToType, outerDocumentType, generatedFields);
+				return handleComponentTag(tagData, assignedToType, outerDocumentTypePath, generatedFields);
 			}
-			return handleInstanceTag(tagData, assignedToType, outerDocumentType, generatedFields);
+			return handleInstanceTag(tagData, assignedToType, outerDocumentTypePath, generatedFields);
 		} else if ((unitData is IMXHXTextData)) {
 			var textData:IMXHXTextData = cast unitData;
 			if (canIgnoreTextData(textData)) {
