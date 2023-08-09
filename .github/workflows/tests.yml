@@ -1,0 +1,31 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        haxe-version: [4.0.5]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: ${{ matrix.haxe-version }}
+      - name: Set up Haxelib dependencies
+        run: |
+          haxelib install utest --quiet
+          haxelib dev mxhx-parser $GITHUB_WORKSPACE
+      - name: Run Basic Interpreter Tests
+        working-directory: test
+        run: haxe test.hxml --interp
+      - name: Run Basic Neko Tests
+        working-directory: test
+        run: |
+          haxe test.hxml --neko bin/test.n
+          neko bin/test.n
