@@ -17,16 +17,22 @@ jobs:
       - uses: krdlab/setup-haxe@v1
         with:
           haxe-version: ${{ matrix.haxe-version }}
+      - uses: cedx/setup-hashlink@v3
       - name: Set up Haxelib dependencies
         run: |
           haxelib install utest --quiet
           haxelib install hxparse --quiet
           haxelib dev mxhx-parser $GITHUB_WORKSPACE
-      - name: Run Basic Interpreter Tests
+      - name: Run Interpreter Tests
         working-directory: test
         run: haxe test.hxml --interp
-      - name: Run Basic Neko Tests
+      - name: Run Neko Tests
         working-directory: test
         run: |
           haxe test.hxml --neko bin/test.n
           neko bin/test.n
+      - name: Run HashLink Tests
+        working-directory: test
+        run: |
+          haxe test.hxml --hl bin/test.hl
+          hl bin/test.hl
