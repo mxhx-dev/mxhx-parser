@@ -64,7 +64,7 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			if (balancingProcessor.wasRepaired) {
 				refreshPositionData(result.units);
 			}
-		} catch (e) {
+		} catch (e:Dynamic) {
 			var curPos = curPos();
 			result.problems.push(new MXHXParserProblem('Unexpected exception: $e\n${CallStack.toString(CallStack.exceptionStack())}', 1530, Error,
 				curPos.psource, curPos.pmin, curPos.pmax));
