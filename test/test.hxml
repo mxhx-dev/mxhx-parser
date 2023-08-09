@@ -1,4 +1,3 @@
---interp
 -cp ../src
 -cp src
 -lib hxparse
