@@ -20,6 +20,7 @@ jobs:
       - name: Set up Haxelib dependencies
         run: |
           haxelib install utest --quiet
+          haxelib install hxparse --quiet
           haxelib dev mxhx-parser $GITHUB_WORKSPACE
       - name: Run Basic Interpreter Tests
         working-directory: test

@@ -18,6 +18,7 @@ jobs:
       - name: Set up Haxelib dependencies
         run: |
           haxelib install dox --quiet
+          haxelib install hxparse --quiet
           haxelib dev mxhx-parser $GITHUB_WORKSPACE
       - name: Build API reference
         working-directory: docs
