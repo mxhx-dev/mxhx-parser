@@ -111,6 +111,12 @@ interface IMXHXTagData extends IMXHXUnitData {
 	function hasExplicitCloseToken():Bool;
 
 	/**
+	 * Determines whether the specified offset falls inside the attribute list
+	 * of this tag.
+	 */
+	function isOffsetInAttributeList(offset:Int):Bool;
+
+	/**
 		Gets the attribute in this tag that has the specified name.
 	**/
 	function getAttributeData(name:String):IMXHXTagAttributeData;

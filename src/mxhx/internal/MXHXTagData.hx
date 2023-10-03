@@ -125,8 +125,17 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 	private function set_attributeData(value:Array<IMXHXTagAttributeData>):Array<IMXHXTagAttributeData> {
 		attributeData = value;
 		attributeMap.clear();
-		for (attribute in attributeData) {
-			attributeMap.set(attribute.name, attribute);
+		if (attributeData.length > 0) {
+			minAttrStart = 0x7FFFFFFF;
+			for (attribute in attributeData) {
+				var attrStart = attribute.start;
+				if (minAttrStart > attrStart) {
+					minAttrStart = attrStart;
+				}
+				attributeMap.set(attribute.name, attribute);
+			}
+		} else {
+			minAttrStart = -1;
 		}
 		return attributeData;
 	}
@@ -159,13 +168,23 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 	}
 
 	override private function get_contentStart():Int {
-		return start + 1;
+		return start + (closeTag ? 2 : 1);
 	}
 
 	override private function get_contentEnd():Int {
 		return end - (explicitCloseToken ? (emptyTag ? 2 : 1) : 0);
 	}
 
+	private var attributesStart(get, never):Int;
+
+	private function get_attributesStart():Int {
+		if (minAttrStart != -1) {
+			return minAttrStart;
+		}
+		return contentStart + name.length;
+	}
+
+	private var minAttrStart:Int = -1;
 	private var closeTag:Bool = false;
 	private var emptyTag:Bool = false;
 	private var explicitCloseToken:Bool = false;
@@ -251,6 +270,14 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 	**/
 	public function setExplicitCloseToken(value:Bool):Void {
 		explicitCloseToken = value;
+	}
+
+	/**
+		@see `mxhx.IMXHXTagData.isOffsetInAttributeList()`
+	**/
+	public function isOffsetInAttributeList(offset:Int):Bool {
+		trace("isOffsetInAttributeList:", attributesStart, end, offset, MXHXData.contains(attributesStart, end, offset));
+		return MXHXData.contains(attributesStart, end, offset);
 	}
 
 	/**
