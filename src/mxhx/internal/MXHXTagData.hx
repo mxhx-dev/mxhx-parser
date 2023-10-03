@@ -276,7 +276,6 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 		@see `mxhx.IMXHXTagData.isOffsetInAttributeList()`
 	**/
 	public function isOffsetInAttributeList(offset:Int):Bool {
-		trace("isOffsetInAttributeList:", attributesStart, end, offset, MXHXData.contains(attributesStart, end, offset));
 		return MXHXData.contains(attributesStart, end, offset);
 	}
 
