@@ -38,6 +38,26 @@ class MXHXParserProblem implements IMXHXSourceLocation {
 	public var end(default, null):Int;
 
 	/**
+		@see `mxhx.IMXHXSourceLocation.line`
+	**/
+	public var line(default, default):Int;
+
+	/**
+		@see `mxhx.IMXHXSourceLocation.endLine`
+	**/
+	public var endLine(default, default):Int;
+
+	/**
+		@see `mxhx.IMXHXSourceLocation.column`
+	**/
+	public var column(default, default):Int;
+
+	/**
+		@see `mxhx.IMXHXSourceLocation.endColumn`
+	**/
+	public var endColumn(default, default):Int;
+
+	/**
 		A message describing the problem.
 	**/
 	public var message(default, null):String;
@@ -55,12 +75,17 @@ class MXHXParserProblem implements IMXHXSourceLocation {
 	/**
 		Creates a new `MXHXParserProblem` object with the given arguments.
 	**/
-	public function new(message:String, code:Null<Int>, severity:MXHXParserProblemSeverity, source:String, start:Int, end:Int) {
+	public function new(message:String, code:Null<Int>, severity:MXHXParserProblemSeverity, source:String, start:Int, end:Int, line:Int, column:Int,
+			endLine:Int, endColumn:Int) {
 		this.message = message;
 		this.code = code;
 		this.severity = severity;
 		this.source = source;
 		this.start = start;
 		this.end = end;
+		this.line = line;
+		this.column = column;
+		this.endLine = endLine;
+		this.endColumn = endColumn;
 	}
 }

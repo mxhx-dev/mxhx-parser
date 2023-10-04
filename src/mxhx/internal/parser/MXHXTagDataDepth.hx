@@ -141,7 +141,7 @@ class MXHXTagDataDepth {
 							var currTag:MXHXTagData = cast currToken;
 							if (!currTag.hasExplicitCloseToken()) {
 								problems.push(new MXHXParserProblem('${currTag.name} tag (or non-tag inside this tag) is unclosed', 1552, Error,
-									currTag.source, currTag.start, currTag.end));
+									currTag.source, currTag.start, currTag.end, currTag.line, currTag.column, currTag.endLine, currTag.endColumn));
 								var fakeMXHXTagData = FakeMXHXTagData.withTag(currTag, true);
 								data[pos] = fakeMXHXTagData;
 								prefixMap.remove(currTag);
@@ -162,7 +162,7 @@ class MXHXTagDataDepth {
 						// seems to be necessary in cases where a close tag is
 						// missing.
 						problems.push(new MXHXParserProblem('${openTag.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, openTag.source,
-							openTag.start, openTag.end));
+							openTag.start, openTag.end, openTag.line, openTag.column, openTag.endLine, openTag.endColumn));
 					}
 				}
 			}
@@ -201,7 +201,8 @@ class MXHXTagDataDepth {
 				tag.source = source;
 			}
 		}
-		return new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, tagData.source, tagData.start, tagData.end);
+		return new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, tagData.source, tagData.start, tagData.end,
+			tagData.line, tagData.column, tagData.endLine, tagData.endColumn);
 	}
 }
 

@@ -36,4 +36,24 @@ interface IMXHXSourceLocation {
 		Gets the source file path.
 	**/
 	var source(default, never):String;
+
+	/**
+		Gets the zero-based starting line number.
+	**/
+	var line(default, never):Int;
+
+	/**
+		Gets the zero-based ending line number.
+	**/
+	var endLine(default, never):Int;
+
+	/**
+		Gets the zero-based starting column number.
+	**/
+	var column(default, never):Int;
+
+	/**
+		Gets the zero-based ending column number.
+	**/
+	var endColumn(default, never):Int;
 }

@@ -42,6 +42,26 @@ class MXHXSourceLocation implements IMXHXSourceLocation {
 	**/
 	public var end(default, default):Int;
 
+	/**
+		@see `mxhx.IMXHXSourceLocation.line`
+	**/
+	public var line(default, default):Int;
+
+	/**
+		@see `mxhx.IMXHXSourceLocation.endLine`
+	**/
+	public var endLine(default, default):Int;
+
+	/**
+		@see `mxhx.IMXHXSourceLocation.column`
+	**/
+	public var column(default, default):Int;
+
+	/**
+		@see `mxhx.IMXHXSourceLocation.endColumn`
+	**/
+	public var endColumn(default, default):Int;
+
 	@:dox(hide)
 	public function toString():String {
 		return 'loc: ${start != -1 ? Std.string(start) : "?"}-${end != -1 ? Std.string(end) : "?"} ${source != null ? source : "?"}';

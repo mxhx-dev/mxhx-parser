@@ -31,6 +31,7 @@ import mxhx.parser.MXHXToken;
 import mxhx.internal.parser.hxparse.Parser;
 
 class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
+	private var byteData:byte.ByteData;
 	private var lexer:MXHXLexer;
 	private var index:Int = -1;
 	private var balancingIndex:Int = 0;
@@ -43,7 +44,8 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 		Creates a new `MXHXParser` object with the given arguments.
 	**/
 	public function new(input:String, sourcePath:String) {
-		lexer = new MXHXLexer(byte.ByteData.ofString(input), sourcePath);
+		byteData = byte.ByteData.ofString(input);
+		lexer = new MXHXLexer(byteData, sourcePath);
 		var ts = new hxparse.LexerTokenSource(lexer, MXHXLexer.topLevel);
 		super(ts);
 	}
@@ -66,8 +68,9 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			}
 		} catch (e:Dynamic) {
 			var curPos = curPos();
+			var linePos = curPos.getLinePosition(byteData);
 			result.problems.push(new MXHXParserProblem('Unexpected exception: $e\n${CallStack.toString(CallStack.exceptionStack())}', 1530, Error,
-				curPos.psource, curPos.pmin, curPos.pmax));
+				curPos.psource, curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 		}
 		for (problem in lexer.problems) {
 			result.problems.push(problem);
@@ -78,8 +81,9 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 	private function parseUnitData():Bool {
 		if (peek(0) == null) {
 			var curPos = lexer.curPos();
+			var linePos = curPos.getLinePosition(byteData);
 			result.problems.push(new MXHXParserProblem('Unexpected character. \'${lexer.current}\' is not allowed here', 1310, Error, curPos.psource,
-				curPos.pmin, curPos.pmax));
+				curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 			junk();
 			return true;
 		}
@@ -89,8 +93,14 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				var instructionData = new MXHXInstructionData(value);
 				instructionData.setLocation(result, ++index);
 				instructionData.parentUnitIndex = depthStack[depthStack.length - 1];
-				instructionData.start = curPos().pmax - value.length;
-				instructionData.end = curPos().pmax;
+				var curPos = curPos();
+				instructionData.start = curPos.pmax - value.length;
+				instructionData.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				instructionData.line = linePos.lineMin - 1;
+				instructionData.endLine = linePos.lineMax - 1;
+				instructionData.column = linePos.posMin;
+				instructionData.endColumn = linePos.posMax;
 				result.units.push(instructionData);
 			case TDtd(value):
 				junk();
@@ -100,8 +110,9 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				if (depthStack.length == 1) {
 					if (hasRootTag) {
 						var curPos = lexer.curPos();
+						var linePos = curPos.getLinePosition(byteData);
 						result.problems.push(new MXHXParserProblem('Only one root tag allowed. \'${lexer.current}\' tag will be ignored', 1431, Error,
-							curPos.psource, curPos.pmin, curPos.pmax));
+							curPos.psource, curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 					}
 					hasRootTag = true;
 				}
@@ -109,8 +120,14 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				tagData.init(value);
 				tagData.setLocation(result, ++index);
 				tagData.parentUnitIndex = depthStack[depthStack.length - 1];
-				tagData.start = curPos().pmin;
-				tagData.end = curPos().pmax;
+				var curPos = curPos();
+				tagData.start = curPos.pmin;
+				tagData.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				tagData.line = linePos.lineMin - 1;
+				tagData.endLine = linePos.lineMax - 1;
+				tagData.column = linePos.posMin;
+				tagData.endColumn = linePos.posMax;
 				result.units.push(tagData);
 				stream.ruleset = MXHXLexer.tag;
 				var attributes:Array<IMXHXTagAttributeData> = [];
@@ -128,8 +145,9 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				junk();
 				if (depthStack.length == 1) {
 					var curPos = lexer.curPos();
+					var linePos = curPos.getLinePosition(byteData);
 					result.problems.push(new MXHXParserProblem('Only one root tag allowed. \'${lexer.current}\' tag will be ignored', 1431, Error,
-						curPos.psource, curPos.pmin, curPos.pmax));
+						curPos.psource, curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 				} else {
 					depthStack.pop();
 					balancingIndex--;
@@ -139,8 +157,14 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				tagData.setLocation(result, ++index);
 				tagData.parentUnitIndex = depthStack[depthStack.length - 1];
 				balancingProcessor.addCloseTag(tagData, balancingIndex);
-				tagData.start = curPos().pmin;
-				tagData.end = curPos().pmax;
+				var curPos = curPos();
+				tagData.start = curPos.pmin;
+				tagData.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				tagData.line = linePos.lineMin - 1;
+				tagData.endLine = linePos.lineMax - 1;
+				tagData.column = linePos.posMin;
+				tagData.endColumn = linePos.posMax;
 				result.units.push(tagData);
 				stream.ruleset = MXHXLexer.tag;
 				tag(tagData);
@@ -151,8 +175,14 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				cdata.setLocation(result, ++index);
 				cdata.parentUnitIndex = depthStack[depthStack.length - 1];
 				var isEnd = StringTools.endsWith(lexer.current, "]]>");
-				cdata.start = curPos().pmax - value.length - 9 - (isEnd ? 3 : 0);
-				cdata.end = curPos().pmax;
+				var curPos = curPos();
+				cdata.start = curPos.pmax - value.length - 9 - (isEnd ? 3 : 0);
+				cdata.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				cdata.line = linePos.lineMin - 1;
+				cdata.endLine = linePos.lineMax - 1;
+				cdata.column = linePos.posMin;
+				cdata.endColumn = linePos.posMax;
 				result.units.push(cdata);
 			case TComment(value):
 				junk();
@@ -160,8 +190,14 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				comment.setLocation(result, ++index);
 				comment.parentUnitIndex = depthStack[depthStack.length - 1];
 				var isEnd = StringTools.endsWith(lexer.current, "-->");
-				comment.start = curPos().pmax - value.length - 4 - (isEnd ? 3 : 0);
-				comment.end = curPos().pmax;
+				var curPos = curPos();
+				comment.start = curPos.pmax - value.length - 4 - (isEnd ? 3 : 0);
+				comment.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				comment.line = linePos.lineMin - 1;
+				comment.endLine = linePos.lineMax - 1;
+				comment.column = linePos.posMin;
+				comment.endColumn = linePos.posMax;
 				result.units.push(comment);
 			case TDocComment(value):
 				junk();
@@ -169,24 +205,42 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				docComment.setLocation(result, ++index);
 				docComment.parentUnitIndex = depthStack[depthStack.length - 1];
 				var isEnd = StringTools.endsWith(lexer.current, "-->");
-				docComment.start = curPos().pmax - value.length - 5 - (isEnd ? 3 : 0);
-				docComment.end = curPos().pmax;
+				var curPos = curPos();
+				docComment.start = curPos.pmax - value.length - 5 - (isEnd ? 3 : 0);
+				docComment.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				docComment.line = linePos.lineMin - 1;
+				docComment.endLine = linePos.lineMax - 1;
+				docComment.column = linePos.posMin;
+				docComment.endColumn = linePos.posMax;
 				result.units.push(docComment);
 			case TWhitespace(value):
 				junk();
 				var whitespace = new MXHXTextData(value, Whitespace);
 				whitespace.setLocation(result, ++index);
 				whitespace.parentUnitIndex = depthStack[depthStack.length - 1];
-				whitespace.start = curPos().pmax - value.length;
-				whitespace.end = curPos().pmax;
+				var curPos = curPos();
+				whitespace.start = curPos.pmax - value.length;
+				whitespace.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				whitespace.line = linePos.lineMin - 1;
+				whitespace.endLine = linePos.lineMax - 1;
+				whitespace.column = linePos.posMin;
+				whitespace.endColumn = linePos.posMax;
 				result.units.push(whitespace);
 			case TText(value):
 				junk();
 				var text = new MXHXTextData(value, Text);
 				text.setLocation(result, ++index);
 				text.parentUnitIndex = depthStack[depthStack.length - 1];
-				text.start = curPos().pmax - value.length;
-				text.end = curPos().pmax;
+				var curPos = curPos();
+				text.start = curPos.pmax - value.length;
+				text.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				text.line = linePos.lineMin - 1;
+				text.endLine = linePos.lineMax - 1;
+				text.column = linePos.posMin;
+				text.endColumn = linePos.posMax;
 				result.units.push(text);
 			case TEof:
 				junk();
@@ -194,7 +248,9 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			default:
 				junk();
 				var curPos = curPos();
-				result.problems.push(new MXHXParserProblem('Unexpected \'${peek(0)}\'', null, Error, curPos.psource, curPos.pmin, curPos.pmax));
+				var linePos = curPos.getLinePosition(byteData);
+				result.problems.push(new MXHXParserProblem('Unexpected \'${peek(0)}\'', null, Error, curPos.psource, curPos.pmin, curPos.pmax,
+					linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 		};
 		return true;
 	}
@@ -204,11 +260,12 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 		if (peek(0) == null) {
 			// the tag is malformed, but we're going to keep going
 			result.problems.push(new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, tagData.source,
-				tagData.start, tagData.end));
+				tagData.start, tagData.end, tagData.line, tagData.column, tagData.endLine, tagData.endColumn));
 			tagData.end = curPos().pmax;
 			var curPos = lexer.curPos();
+			var linePos = curPos.getLinePosition(byteData);
 			result.problems.push(new MXHXParserProblem('Unexpected character. \'${lexer.current}\' is not allowed here', 1310, Error, curPos.psource,
-				curPos.pmin, curPos.pmax));
+				curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 			junk();
 			return;
 		}
@@ -221,16 +278,24 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				junk();
 				if (tagData.isCloseTag()) {
 					// can't have attributes
-					result.problems.push(new MXHXParserProblem('${lexer.current} is not allowed here', 1510, Error, curPos().psource, curPos().pmin,
-						curPos().pmax));
+					var curPos = curPos();
+					var linePos = curPos.getLinePosition(byteData);
+					result.problems.push(new MXHXParserProblem('${lexer.current} is not allowed here', 1510, Error, curPos.psource, curPos.pmin, curPos.pmax,
+						linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 					tag(tagData, attributes, prefixMap);
 					return;
 				}
 				var attributeData = new MXHXTagAttributeData(value);
 				tagData.parentUnitIndex = depthStack[depthStack.length - 1];
 				attributeData.parentTag = tagData;
-				attributeData.start = curPos().pmin;
-				attributeData.end = curPos().pmax;
+				var curPos = curPos();
+				attributeData.start = curPos.pmin;
+				attributeData.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				attributeData.line = linePos.lineMin - 1;
+				attributeData.endLine = linePos.lineMax - 1;
+				attributeData.column = linePos.posMin;
+				attributeData.endColumn = linePos.posMax;
 				attributeData.source = result.source;
 				attribute(attributeData);
 				attributes.push(attributeData);
@@ -249,21 +314,31 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				junk();
 				if (tagData.isCloseTag()) {
 					// can't have attributes
-					result.problems.push(new MXHXParserProblem('${lexer.current} is not allowed here', 1510, Error, curPos().psource, curPos().pmin,
-						curPos().pmax));
+					var curPos = curPos();
+					var linePos = curPos.getLinePosition(byteData);
+					result.problems.push(new MXHXParserProblem('${lexer.current} is not allowed here', 1510, Error, curPos.psource, curPos.pmin, curPos.pmax,
+						linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 					tag(tagData, attributes, prefixMap);
 					return;
 				}
 				var attributeData = new MXHXTagAttributeData(value);
 				tagData.parentUnitIndex = depthStack[depthStack.length - 1];
 				attributeData.parentTag = tagData;
-				attributeData.start = curPos().pmin;
-				attributeData.end = curPos().pmax;
+				var curPos = curPos();
+				attributeData.start = curPos.pmin;
+				attributeData.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				attributeData.line = linePos.lineMin - 1;
+				attributeData.endLine = linePos.lineMax - 1;
+				attributeData.column = linePos.posMin;
+				attributeData.endColumn = linePos.posMax;
 				attributeData.source = result.source;
 				attribute(attributeData);
 				if (Lambda.exists(attributes, other -> other.name == attributeData.name)) {
 					result.problems.push(new MXHXParserProblem('Attribute \'${attributeData.shortName}\' bound to namespace \'${attributeData.uri}\' is already specified for element \'${tagData.name}\'. It will be ignored.',
-						1408, Error, curPos().psource, curPos().pmin, curPos().pmax));
+						1408, Error, curPos.psource, curPos.pmin, curPos.pmax, linePos.lineMin
+						- 1, linePos.posMin, linePos.lineMax
+						- 1, linePos.posMax));
 				}
 				attributes.push(attributeData);
 				tag(tagData, attributes, prefixMap);
@@ -279,19 +354,25 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			case TOpenTagStart(_) | TCloseTagStart(_):
 				junk();
 				// the tag is malformed, but we're going to keep going
-				result.problems.push(new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, curPos().psource,
-					curPos().pmin, curPos().pmax));
-				tagData.end = curPos().pmin;
+				var curPos = curPos();
+				var linePos = curPos.getLinePosition(byteData);
+				result.problems.push(new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, curPos.psource,
+					curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+				tagData.end = curPos.pmin;
 				setLexerPos(oldLexerPos);
 			case TEof:
 				junk();
-				result.problems.push(new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, curPos().psource,
-					curPos().pmax, curPos().pmax));
-				tagData.end = curPos().pmax;
+				var curPos = curPos();
+				var linePos = curPos.getLinePosition(byteData);
+				result.problems.push(new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, curPos.psource,
+					curPos.pmax, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+				tagData.end = curPos.pmax;
 				setLexerPos(oldLexerPos);
 			default:
-				result.problems.push(new MXHXParserProblem('${lexer.current} is not allowed here', 1510, Error, curPos().psource, curPos().pmin,
-					curPos().pmax));
+				var curPos = curPos();
+				var linePos = curPos.getLinePosition(byteData);
+				result.problems.push(new MXHXParserProblem('${lexer.current} is not allowed here', 1510, Error, curPos.psource, curPos.pmin, curPos.pmax,
+					linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 		}
 	}
 
@@ -304,9 +385,11 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				attributeData.setValueStartIncludingDelimiters(curPos().pmax);
 			default:
 				// the attribute is malformed, but we're going to keep going
+				var curPos = curPos();
+				var linePos = curPos.getLinePosition(byteData);
 				result.problems.push(new MXHXParserProblem('${attributeData.name} attribute is missing a value', 1510, Error, attributeData.source,
-					attributeData.start, curPos().pmin));
-				attributeData.end = curPos().pmin;
+					attributeData.start, curPos.pmin, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+				attributeData.end = curPos.pmin;
 				setLexerPos(oldLexerPos);
 				return;
 		}
@@ -325,9 +408,11 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			default:
 				// the attribute value is malformed, so create an error, but
 				// then we're going to continue parsing as if it were closed
+				var curPos = curPos();
+				var linePos = curPos.getLinePosition(byteData);
 				result.problems.push(new MXHXParserProblem('${attributeData.name} attribute is missing a value', 1510, Error, attributeData.source,
-					attributeData.start, curPos().pmin));
-				attributeData.end = curPos().pmin;
+					attributeData.start, curPos.pmin, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+				attributeData.end = curPos.pmin;
 				setLexerPos(oldLexerPos);
 		}
 	}
@@ -352,7 +437,9 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			default:
 				junk();
 				var curPos = curPos();
-				result.problems.push(new MXHXParserProblem('Unexpected \'${peek(0)}\'', null, Error, curPos.psource, curPos.pmin, curPos.pmax));
+				var linePos = curPos.getLinePosition(byteData);
+				result.problems.push(new MXHXParserProblem('Unexpected \'${peek(0)}\'', null, Error, curPos.psource, curPos.pmin, curPos.pmax,
+					linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 		}
 	}
 
@@ -594,8 +681,9 @@ private class MXHXLexer extends Lexer {
 			func: function(lexer:Lexer) {
 				var mxhxLexer = cast(lexer, MXHXLexer);
 				var curPos = lexer.curPos();
+				var linePos = curPos.getLinePosition(lexer.input);
 				mxhxLexer.problems.push(new MXHXParserProblem("input ended before processing instruction is closed", 1549, Error, curPos.psource, curPos.pmin,
-					curPos.pmax));
+					curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 				return curPos.pmax;
 			}
 		}
@@ -637,8 +725,9 @@ private class MXHXLexer extends Lexer {
 			func: function(lexer:Lexer) {
 				var mxhxLexer = cast(lexer, MXHXLexer);
 				var curPos = lexer.curPos();
+				var linePos = curPos.getLinePosition(lexer.input);
 				mxhxLexer.problems.push(new MXHXParserProblem("input ended before document type definition is closed", 1549, Error, curPos.psource,
-					curPos.pmin, curPos.pmax));
+					curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 				return curPos.pmax;
 			}
 		}
@@ -664,7 +753,9 @@ private class MXHXLexer extends Lexer {
 			func: function(lexer:Lexer) {
 				var mxhxLexer = cast(lexer, MXHXLexer);
 				var curPos = lexer.curPos();
-				mxhxLexer.problems.push(new MXHXParserProblem("input ended before comment is closed", 1549, Error, curPos.psource, curPos.pmin, curPos.pmax));
+				var linePos = curPos.getLinePosition(lexer.input);
+				mxhxLexer.problems.push(new MXHXParserProblem("input ended before comment is closed", 1549, Error, curPos.psource, curPos.pmin, curPos.pmax,
+					linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 				return curPos.pmax;
 			}
 		}
@@ -690,7 +781,9 @@ private class MXHXLexer extends Lexer {
 			func: function(lexer:Lexer) {
 				var mxhxLexer = cast(lexer, MXHXLexer);
 				var curPos = lexer.curPos();
-				mxhxLexer.problems.push(new MXHXParserProblem("input ended before CDATA is closed", 1549, Error, curPos.psource, curPos.pmin, curPos.pmax));
+				var linePos = curPos.getLinePosition(lexer.input);
+				mxhxLexer.problems.push(new MXHXParserProblem("input ended before CDATA is closed", 1549, Error, curPos.psource, curPos.pmin, curPos.pmax,
+					linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 				return curPos.pmax;
 			}
 		}
