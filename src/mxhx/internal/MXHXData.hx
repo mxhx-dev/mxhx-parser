@@ -84,6 +84,9 @@ class MXHXData implements IMXHXData {
 		@see `mxhx.IMXHXData.getPrefixMapForTag()`
 	**/
 	public function getPrefixMapForTag(tagData:IMXHXTagData):PrefixMap {
+		if (tagData == null) {
+			return null;
+		}
 		var result = prefixMapMap.get(tagData);
 		if (result != null) {
 			return result;
