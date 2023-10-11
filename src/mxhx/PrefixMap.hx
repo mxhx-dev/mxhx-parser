@@ -102,9 +102,12 @@ class PrefixMap {
 	**/
 	public function getPrefixesForUri(uri:String):Array<String> {
 		var result:Array<String> = [];
-		var keys = uriToPrefix.get(uri).keys();
-		while (keys.hasNext()) {
-			result.push(keys.next());
+		var prefixes = uriToPrefix.get(uri);
+		if (prefixes != null) {
+			var keys = prefixes.keys();
+			while (keys.hasNext()) {
+				result.push(keys.next());
+			}
 		}
 		return result;
 	}
