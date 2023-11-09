@@ -67,4 +67,17 @@ interface IMXHXData {
 		text node, will return the surrounding tag instead.
 	**/
 	function findTagOrSurroundingTagContainingOffset(offset:Int):IMXHXTagData;
+
+	/**
+		Get the unit that contains this offset.
+	**/
+	function findUnitContainingOffset(offset:Int):IMXHXUnitData;
+
+	/**
+		Get the open, close, or empty tag that contains this offset. Note that
+		if offset is inside a text node, this returns `null`. If you want the
+		surrounding tag in that case, use
+		`findTagOrSurroundingTagContainingOffset()` instead.
+	**/
+	function findTagContainingOffset(offset:Int):IMXHXTagData;
 }
