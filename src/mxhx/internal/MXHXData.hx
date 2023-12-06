@@ -33,7 +33,7 @@ class MXHXData implements IMXHXData {
 	}
 
 	/**
-		@see `mxhx.IMXHXData.sourcee`
+		@see `mxhx.IMXHXData.source`
 	**/
 	public var source(default, default):String = null;
 
