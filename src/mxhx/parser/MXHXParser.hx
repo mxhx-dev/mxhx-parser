@@ -345,12 +345,20 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			case TTagEnd:
 				junk();
 				tagData.setExplicitCloseToken(true);
-				tagData.end = curPos().pmax;
+				var curPos = curPos();
+				tagData.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				tagData.endLine = linePos.lineMax - 1;
+				tagData.endColumn = linePos.posMax;
 			case TEmptyTagEnd:
 				junk();
 				tagData.setExplicitCloseToken(true);
 				tagData.setEmptyTag(true);
-				tagData.end = curPos().pmax;
+				var curPos = curPos();
+				tagData.end = curPos.pmax;
+				var linePos = curPos.getLinePosition(byteData);
+				tagData.endLine = linePos.lineMax - 1;
+				tagData.endColumn = linePos.posMax;
 			case TOpenTagStart(_) | TCloseTagStart(_):
 				junk();
 				// the tag is malformed, but we're going to keep going
@@ -359,6 +367,8 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				result.problems.push(new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, curPos.psource,
 					curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 				tagData.end = curPos.pmin;
+				tagData.endLine = linePos.lineMax - 1;
+				tagData.endColumn = linePos.posMax;
 				setLexerPos(oldLexerPos);
 			case TEof:
 				junk();
@@ -367,6 +377,8 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				result.problems.push(new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, curPos.psource,
 					curPos.pmax, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 				tagData.end = curPos.pmax;
+				tagData.endLine = linePos.lineMax - 1;
+				tagData.endColumn = linePos.posMax;
 				setLexerPos(oldLexerPos);
 			default:
 				var curPos = curPos();
