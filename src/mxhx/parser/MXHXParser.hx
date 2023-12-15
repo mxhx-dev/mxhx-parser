@@ -393,8 +393,12 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 		switch (peek(0)) {
 			case TEquals:
 				junk();
-				attributeData.end = curPos().pmax;
-				attributeData.setValueStartIncludingDelimiters(curPos().pmax);
+				var curPos = curPos();
+				var linePos = curPos.getLinePosition(byteData);
+				attributeData.end = curPos.pmax;
+				attributeData.endLine = linePos.lineMax - 1;
+				attributeData.endColumn = linePos.posMax;
+				attributeData.setValueStartIncludingDelimiters(curPos.pmax);
 			default:
 				// the attribute is malformed, but we're going to keep going
 				var curPos = curPos();
@@ -402,6 +406,8 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				result.problems.push(new MXHXParserProblem('${attributeData.name} attribute is missing a value', 1510, Error, attributeData.source,
 					attributeData.start, curPos.pmin, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 				attributeData.end = curPos.pmin;
+				attributeData.endLine = linePos.lineMin - 1;
+				attributeData.endColumn = linePos.posMin;
 				setLexerPos(oldLexerPos);
 				return;
 		}
@@ -435,7 +441,11 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			case TString(value):
 				junk();
 				attributeData.setValueIncludingDelimeters(value);
-				attributeData.end = curPos().pmax;
+				var curPos = curPos();
+				var linePos = curPos.getLinePosition(byteData);
+				attributeData.end = curPos.pmax;
+				attributeData.endLine = linePos.lineMax - 1;
+				attributeData.endColumn = linePos.posMax;
 				// keep going until the closing quote is found
 				if (lexer.current == quote) {
 					return;
@@ -444,7 +454,11 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			case TOpenTagStart(_) | TEof:
 				junk();
 				// this is an error, but it will be handled upstream
-				attributeData.end = curPos().pmax;
+				var curPos = curPos();
+				var linePos = curPos.getLinePosition(byteData);
+				attributeData.end = curPos.pmax;
+				attributeData.endLine = linePos.lineMax - 1;
+				attributeData.endColumn = linePos.posMax;
 				setLexerPos(oldLexerPos);
 			default:
 				junk();
