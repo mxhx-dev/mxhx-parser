@@ -17,10 +17,9 @@ class MXHXParserTextTest extends Test {
 
 		Assert.isNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit = mxhxData.units[0];
+		var unit = mxhxData.unitAt(0);
 		Assert.notNull(unit);
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
@@ -42,10 +41,9 @@ class MXHXParserTextTest extends Test {
 
 		Assert.isNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit = mxhxData.units[0];
+		var unit = mxhxData.unitAt(0);
 		Assert.notNull(unit);
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);

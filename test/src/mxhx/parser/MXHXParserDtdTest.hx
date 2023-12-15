@@ -16,8 +16,7 @@ class MXHXParserDtdTest extends Test {
 
 		Assert.isNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(0, mxhxData.units.length);
+		Assert.equals(0, mxhxData.numUnits);
 	}
 
 	public function testParserWithDtdUnclosed():Void {
@@ -36,7 +35,6 @@ class MXHXParserDtdTest extends Test {
 
 		Assert.isNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(0, mxhxData.units.length);
+		Assert.equals(0, mxhxData.numUnits);
 	}
 }

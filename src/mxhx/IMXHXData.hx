@@ -35,9 +35,9 @@ interface IMXHXData {
 	var source(default, never):String;
 
 	/**
-		Get all of the MXHX units found in this `IMXHXData`.
+		Returns the number of units found in this `IMXHXData`.
 	**/
-	var units(default, never):Array<IMXHXUnitData>;
+	var numUnits(get, never):Int;
 
 	/**
 		Gets the root tag of this `IMXHXData`. Returns `null` if there is no
@@ -52,6 +52,8 @@ interface IMXHXData {
 
 	/**
 		Gets an MXHX unit by index. Returns `null` if the index is out of range.
+
+		@see `IMXHXData.numUnits`
 	**/
 	function unitAt(index:Int):IMXHXUnitData;
 

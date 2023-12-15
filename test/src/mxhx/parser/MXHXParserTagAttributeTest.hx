@@ -16,10 +16,9 @@ class MXHXParserTagAttributeTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -64,10 +63,9 @@ class MXHXParserTagAttributeTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -110,10 +108,9 @@ class MXHXParserTagAttributeTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -162,10 +159,9 @@ class MXHXParserTagAttributeTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -214,10 +210,9 @@ class MXHXParserTagAttributeTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);

@@ -434,11 +434,10 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 		// until the stack is null, to ensure that we're balanced out to the
 		// surrounding tag.
 		var tagStack:Array<IMXHXTagData> = [];
-		var units = parent.units;
 		var result:IMXHXTagData = null;
 		var i = startTag.index;
 		while (i >= 0) {
-			var unit = units[i];
+			var unit = parent.unitAt(i);
 			if ((unit is IMXHXTagData)) {
 				var tag:IMXHXTagData = cast unit;
 				if (tag.isEmptyTag()) {
@@ -495,10 +494,9 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 		// until the stack is null, to ensure that we're balanced out to the
 		// surrounding tag.
 		var tagStack:Array<IMXHXTagData> = [];
-		var units = parent.units;
 		var result:IMXHXTagData = null;
-		for (i in startTag.index...units.length) {
-			var unit = units[i];
+		for (i in startTag.index...parent.numUnits) {
+			var unit = parent.unitAt(i);
 			if ((unit is IMXHXTagData)) {
 				var tag:IMXHXTagData = cast unit;
 				if (tag.isEmptyTag()) {

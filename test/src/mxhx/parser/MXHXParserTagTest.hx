@@ -16,10 +16,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit = mxhxData.units[0];
+		var unit = mxhxData.unitAt(0);
 		Assert.notNull(unit);
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
@@ -50,10 +49,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(2, mxhxData.units.length);
+		Assert.equals(2, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -73,7 +71,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap0);
 		Assert.isFalse(prefixMap0.containsPrefix("p"));
 
-		var unit1 = mxhxData.units[1];
+		var unit1 = mxhxData.unitAt(1);
 		Assert.notNull(unit1);
 		Assert.equals(SOURCE, unit1.source);
 		Assert.equals(7, unit1.start);
@@ -109,10 +107,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(2, mxhxData.units.length);
+		Assert.equals(2, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -132,7 +129,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap0);
 		Assert.isFalse(prefixMap0.containsPrefix("p"));
 
-		var unit1 = mxhxData.units[1];
+		var unit1 = mxhxData.unitAt(1);
 		Assert.notNull(unit1);
 		Assert.equals(SOURCE, unit1.source);
 		Assert.equals(6, unit1.start);
@@ -168,10 +165,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(2, mxhxData.units.length);
+		Assert.equals(2, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -191,7 +187,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap0);
 		Assert.isFalse(prefixMap0.containsPrefix("p"));
 
-		var unit1 = mxhxData.units[1];
+		var unit1 = mxhxData.unitAt(1);
 		Assert.notNull(unit1);
 		Assert.equals(SOURCE, unit1.source);
 		Assert.equals(7, unit1.start);
@@ -227,10 +223,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(5, mxhxData.units.length);
+		Assert.equals(5, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -249,7 +244,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap0);
 		Assert.isFalse(prefixMap0.containsPrefix("p"));
 
-		var unit1 = mxhxData.units[1];
+		var unit1 = mxhxData.unitAt(1);
 		Assert.notNull(unit1);
 		Assert.equals(SOURCE, unit1.source);
 		Assert.equals(9, unit1.start);
@@ -268,7 +263,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap1);
 		Assert.isFalse(prefixMap1.containsPrefix("p"));
 
-		var unit2 = mxhxData.units[2];
+		var unit2 = mxhxData.unitAt(2);
 		Assert.notNull(unit2);
 		Assert.equals(SOURCE, unit2.source);
 		Assert.equals(16, unit2.start);
@@ -287,7 +282,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap2);
 		Assert.isFalse(prefixMap2.containsPrefix("p"));
 
-		var unit3 = mxhxData.units[3];
+		var unit3 = mxhxData.unitAt(3);
 		Assert.notNull(unit3);
 		Assert.equals(SOURCE, unit3.source);
 		Assert.equals(23, unit3.start);
@@ -306,7 +301,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap3);
 		Assert.isFalse(prefixMap3.containsPrefix("q"));
 
-		var unit4 = mxhxData.units[4];
+		var unit4 = mxhxData.unitAt(4);
 		Assert.notNull(unit4);
 		Assert.equals(SOURCE, unit4.source);
 		Assert.equals(33, unit4.start);
@@ -342,10 +337,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(1, mxhxData.units.length);
+		Assert.equals(1, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -382,10 +376,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(4, mxhxData.units.length);
+		Assert.equals(4, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -405,7 +398,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap0);
 		Assert.isFalse(prefixMap0.containsPrefix("p"));
 
-		var unit1 = mxhxData.units[1];
+		var unit1 = mxhxData.unitAt(1);
 		Assert.notNull(unit1);
 		Assert.equals(SOURCE, unit1.source);
 		Assert.equals(9, unit1.start);
@@ -424,7 +417,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap1);
 		Assert.isFalse(prefixMap1.containsPrefix("p"));
 
-		var unit2 = mxhxData.units[2];
+		var unit2 = mxhxData.unitAt(2);
 		Assert.notNull(unit2);
 		Assert.equals(SOURCE, unit2.source);
 		Assert.equals(16, unit2.start);
@@ -443,7 +436,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap2);
 		Assert.isFalse(prefixMap2.containsPrefix("p"));
 
-		var unit3 = mxhxData.units[3];
+		var unit3 = mxhxData.unitAt(3);
 		Assert.notNull(unit3);
 		Assert.equals(SOURCE, unit3.source);
 		Assert.equals(16, unit3.start);
@@ -485,10 +478,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(2, mxhxData.units.length);
+		Assert.equals(2, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -508,7 +500,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap0);
 		Assert.isFalse(prefixMap0.containsPrefix("p"));
 
-		var unit1 = mxhxData.units[1];
+		var unit1 = mxhxData.unitAt(1);
 		Assert.notNull(unit1);
 		Assert.equals(SOURCE, unit1.source);
 		Assert.equals(9, unit1.start);
@@ -544,10 +536,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(3, mxhxData.units.length);
+		Assert.equals(3, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -567,7 +558,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap0);
 		Assert.isFalse(prefixMap0.containsPrefix("p"));
 
-		var unit1 = mxhxData.units[1];
+		var unit1 = mxhxData.unitAt(1);
 		Assert.notNull(unit1);
 		Assert.equals(SOURCE, unit1.source);
 		Assert.equals(9, unit1.start);
@@ -586,7 +577,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap1);
 		Assert.isFalse(prefixMap1.containsPrefix("p"));
 
-		var unit2 = mxhxData.units[2];
+		var unit2 = mxhxData.unitAt(2);
 		Assert.notNull(unit2);
 		Assert.equals(SOURCE, unit2.source);
 		Assert.equals(16, unit2.start);
@@ -622,10 +613,9 @@ class MXHXParserTagTest extends Test {
 
 		Assert.notNull(mxhxData.rootTag);
 		Assert.equals(SOURCE, mxhxData.source);
-		Assert.notNull(mxhxData.units);
-		Assert.equals(3, mxhxData.units.length);
+		Assert.equals(3, mxhxData.numUnits);
 
-		var unit0 = mxhxData.units[0];
+		var unit0 = mxhxData.unitAt(0);
 		Assert.notNull(unit0);
 		Assert.equals(SOURCE, unit0.source);
 		Assert.equals(0, unit0.start);
@@ -645,7 +635,7 @@ class MXHXParserTagTest extends Test {
 		Assert.notNull(prefixMap0);
 		Assert.isFalse(prefixMap0.containsPrefix("p"));
 
-		var unit1 = mxhxData.units[1];
+		var unit1 = mxhxData.unitAt(1);
 		Assert.notNull(unit1);
 		Assert.equals(SOURCE, unit1.source);
 		Assert.equals(7, unit1.start);

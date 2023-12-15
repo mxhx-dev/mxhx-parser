@@ -38,7 +38,16 @@ class MXHXData implements IMXHXData {
 	public var source(default, default):String = null;
 
 	/**
-		@see `mxhx.IMXHXData.units`
+		@see `mxhx.IMXHXData.numUnits`
+	**/
+	public var numUnits(get, never):Int;
+
+	private function get_numUnits():Int {
+		return units.length;
+	}
+
+	/**
+		Get all of the MXHX units found in this `MXHXData`.
 	**/
 	public var units(default, default):Array<IMXHXUnitData> = [];
 
