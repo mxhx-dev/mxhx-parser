@@ -35,32 +35,32 @@ class MXHXSourceLocation implements IMXHXSourceLocation {
 	/**
 		@see `mxhx.IMXHXSourceLocation.start`
 	**/
-	public var start(default, default):Int;
+	public var start(default, default):Int = -1;
 
 	/**
 		@see `mxhx.IMXHXSourceLocation.end`
 	**/
-	public var end(default, default):Int;
+	public var end(default, default):Int = -1;
 
 	/**
 		@see `mxhx.IMXHXSourceLocation.line`
 	**/
-	public var line(default, default):Int;
+	public var line(default, default):Int = -1;
 
 	/**
 		@see `mxhx.IMXHXSourceLocation.endLine`
 	**/
-	public var endLine(default, default):Int;
+	public var endLine(default, default):Int = -1;
 
 	/**
 		@see `mxhx.IMXHXSourceLocation.column`
 	**/
-	public var column(default, default):Int;
+	public var column(default, default):Int = -1;
 
 	/**
 		@see `mxhx.IMXHXSourceLocation.endColumn`
 	**/
-	public var endColumn(default, default):Int;
+	public var endColumn(default, default):Int = -1;
 
 	@:dox(hide)
 	public function toString():String {
