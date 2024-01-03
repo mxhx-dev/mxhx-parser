@@ -97,9 +97,15 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				instructionData.start = curPos.pmax - value.length;
 				instructionData.end = curPos.pmax;
 				var linePos = curPos.getLinePosition(byteData);
-				instructionData.line = linePos.lineMin - 1;
+				if (result.numUnits == 0) {
+					instructionData.line = 0;
+					instructionData.column = 0;
+				} else {
+					var prevUnit = result.units[result.numUnits - 1];
+					instructionData.line = prevUnit.endLine;
+					instructionData.column = prevUnit.endColumn;
+				}
 				instructionData.endLine = linePos.lineMax - 1;
-				instructionData.column = linePos.posMin;
 				instructionData.endColumn = linePos.posMax;
 				result.units.push(instructionData);
 			case TDtd(value):
@@ -179,9 +185,15 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				cdata.start = curPos.pmax - value.length - 9 - (isEnd ? 3 : 0);
 				cdata.end = curPos.pmax;
 				var linePos = curPos.getLinePosition(byteData);
-				cdata.line = linePos.lineMin - 1;
+				if (result.numUnits == 0) {
+					cdata.line = 0;
+					cdata.column = 0;
+				} else {
+					var prevUnit = result.units[result.numUnits - 1];
+					cdata.line = prevUnit.endLine;
+					cdata.column = prevUnit.endColumn;
+				}
 				cdata.endLine = linePos.lineMax - 1;
-				cdata.column = linePos.posMin;
 				cdata.endColumn = linePos.posMax;
 				result.units.push(cdata);
 			case TComment(value):
@@ -194,9 +206,15 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				comment.start = curPos.pmax - value.length - 4 - (isEnd ? 3 : 0);
 				comment.end = curPos.pmax;
 				var linePos = curPos.getLinePosition(byteData);
-				comment.line = linePos.lineMin - 1;
+				if (result.numUnits == 0) {
+					comment.line = 0;
+					comment.column = 0;
+				} else {
+					var prevUnit = result.units[result.numUnits - 1];
+					comment.line = prevUnit.endLine;
+					comment.column = prevUnit.endColumn;
+				}
 				comment.endLine = linePos.lineMax - 1;
-				comment.column = linePos.posMin;
 				comment.endColumn = linePos.posMax;
 				result.units.push(comment);
 			case TDocComment(value):
@@ -209,9 +227,15 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				docComment.start = curPos.pmax - value.length - 5 - (isEnd ? 3 : 0);
 				docComment.end = curPos.pmax;
 				var linePos = curPos.getLinePosition(byteData);
-				docComment.line = linePos.lineMin - 1;
+				if (result.numUnits == 0) {
+					docComment.line = 0;
+					docComment.column = 0;
+				} else {
+					var prevUnit = result.units[result.numUnits - 1];
+					docComment.line = prevUnit.endLine;
+					docComment.column = prevUnit.endColumn;
+				}
 				docComment.endLine = linePos.lineMax - 1;
-				docComment.column = linePos.posMin;
 				docComment.endColumn = linePos.posMax;
 				result.units.push(docComment);
 			case TWhitespace(value):
