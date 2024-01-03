@@ -23,6 +23,10 @@ class MXHXParserCDataTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(19, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(19, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.CData, textData.textType);
@@ -46,6 +50,10 @@ class MXHXParserCDataTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(29, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(1, unit.endLine);
+		Assert.equals(9, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.CData, textData.textType);
@@ -69,6 +77,10 @@ class MXHXParserCDataTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(12, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(12, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.CData, textData.textType);
@@ -98,6 +110,10 @@ class MXHXParserCDataTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(16, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(16, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.CData, textData.textType);

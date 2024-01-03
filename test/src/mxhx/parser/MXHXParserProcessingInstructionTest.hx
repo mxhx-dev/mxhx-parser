@@ -24,6 +24,10 @@ class MXHXParserProcessingInstructionTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(38, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(38, unit.endColumn);
 		Assert.isOfType(unit, IMXHXInstructionData);
 		var instructionData = cast(unit, IMXHXInstructionData);
 		Assert.equals(instruction, instructionData.instructionText);
@@ -55,6 +59,10 @@ class MXHXParserProcessingInstructionTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(14, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(14, unit.endColumn);
 		Assert.isOfType(unit, IMXHXInstructionData);
 		var instructionData = cast(unit, IMXHXInstructionData);
 		Assert.equals(instruction, instructionData.instructionText);

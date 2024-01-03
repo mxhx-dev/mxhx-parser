@@ -24,6 +24,10 @@ class MXHXParserTextTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(14, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(14, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.Text, textData.textType);
@@ -48,6 +52,10 @@ class MXHXParserTextTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(24, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(1, unit.endLine);
+		Assert.equals(14, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.Text, textData.textType);

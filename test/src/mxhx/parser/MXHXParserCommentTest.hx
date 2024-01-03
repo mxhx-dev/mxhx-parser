@@ -23,6 +23,10 @@ class MXHXParserCommentTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(16, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(16, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.Comment, textData.textType);
@@ -46,6 +50,10 @@ class MXHXParserCommentTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(26, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(1, unit.endLine);
+		Assert.equals(11, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.Comment, textData.textType);
@@ -69,6 +77,10 @@ class MXHXParserCommentTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(7, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(7, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.Comment, textData.textType);
@@ -98,6 +110,10 @@ class MXHXParserCommentTest extends Test {
 		Assert.equals(SOURCE, unit.source);
 		Assert.equals(0, unit.start);
 		Assert.equals(13, unit.end);
+		Assert.equals(0, unit.line);
+		Assert.equals(0, unit.column);
+		Assert.equals(0, unit.endLine);
+		Assert.equals(13, unit.endColumn);
 		Assert.isOfType(unit, IMXHXTextData);
 		var textData = cast(unit, IMXHXTextData);
 		Assert.equals(MXHXTextType.Comment, textData.textType);
