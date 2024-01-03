@@ -390,9 +390,10 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				var linePos = curPos.getLinePosition(byteData);
 				result.problems.push(new MXHXParserProblem('${tagData.name} tag (or non-tag inside this tag) is unclosed', 1552, Error, curPos.psource,
 					curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+				// end at the start of the new tag
 				tagData.end = curPos.pmin;
-				tagData.endLine = linePos.lineMax - 1;
-				tagData.endColumn = linePos.posMax;
+				tagData.endLine = linePos.lineMin - 1;
+				tagData.endColumn = linePos.posMin;
 				setLexerPos(oldLexerPos);
 			case TEof:
 				junk();
