@@ -59,6 +59,11 @@ interface IMXHXTagData extends IMXHXUnitData {
 	var parentTag(get, never):IMXHXTagData;
 
 	/**
+		Gets all of the content in this tag.
+	**/
+	var contentData(get, never):Array<IMXHXTagContentData>;
+
+	/**
 		Gets all of the attributes in this tag.
 	**/
 	var attributeData(get, never):Array<IMXHXTagAttributeData>;

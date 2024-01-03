@@ -15,42 +15,27 @@
 	limitations under the License.
  */
 
-package mxhx;
+package mxhx.internal;
 
 /**
-	Represents different kinds of text elements in [MXHX](https://mxhx.dev).
-
-	@see `mxhx.IMXHXTextData`
-	@see `mxhx.IMXHXTextData.textType`
+	Represents tag whitespace in [MXHX](https://mxhx.dev).
 **/
-enum MXHXTextType {
+class MXHXTagWhitespaceData extends MXHXSourceLocation implements IMXHXTagWhitespaceData {
 	/**
-		A text child inside of an element.
+		@see `mxhx.IMXHXTextData.content`
 	**/
-	Text;
+	public var content(default, default):String = null;
 
 	/**
-		A whitespace child inside of an element.
+		@see `mxhx.IMXHXTagAttributeData.parentTag`
 	**/
-	Whitespace;
+	public var parentTag(default, default):IMXHXTagData;
 
 	/**
-		A `<![CDATA[` block.
+		Creates a new `MXHXTagAttributeData` object with the given arguments.
 	**/
-	CData;
-
-	/**
-		A `<!-- -->`comment block.
-	**/
-	Comment;
-
-	/**
-		A `<!--- -->` documentation comment block.
-	**/
-	DocComment;
-
-	/**
-		A `<!DOCTYPE>` tag
-	**/
-	Dtd;
+	public function new(?content:String) {
+		super();
+		this.content = content;
+	}
 }

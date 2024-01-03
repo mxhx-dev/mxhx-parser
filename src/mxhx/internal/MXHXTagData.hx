@@ -123,7 +123,27 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 	}
 
 	private function set_attributeData(value:Array<IMXHXTagAttributeData>):Array<IMXHXTagAttributeData> {
-		attributeData = value;
+		contentData = value.map(function(item):IMXHXTagContentData {
+			return item;
+		});
+		return attributeData;
+	}
+
+	/**
+		@see `mxhx.IMXHXTagData.contentData`
+	**/
+	@:isVar
+	public var contentData(get, set):Array<IMXHXTagContentData> = [];
+
+	private function get_contentData():Array<IMXHXTagContentData> {
+		return contentData;
+	}
+
+	private function set_contentData(value:Array<IMXHXTagContentData>):Array<IMXHXTagContentData> {
+		contentData = value;
+		@:bypassAccessor attributeData = value.filter(item -> (item is IMXHXTagAttributeData)).map(function(item):IMXHXTagAttributeData {
+			return cast item;
+		});
 		attributeMap.clear();
 		if (attributeData.length > 0) {
 			minAttrStart = 0x7FFFFFFF;
@@ -137,7 +157,7 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 		} else {
 			minAttrStart = -1;
 		}
-		return attributeData;
+		return contentData;
 	}
 
 	/**

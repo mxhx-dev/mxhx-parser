@@ -18,39 +18,11 @@
 package mxhx;
 
 /**
-	Represents different kinds of text elements in [MXHX](https://mxhx.dev).
-
-	@see `mxhx.IMXHXTextData`
-	@see `mxhx.IMXHXTextData.textType`
+	Represents whitespace of a tag in [MXHX](https://mxhx.dev).
 **/
-enum MXHXTextType {
+interface IMXHXTagWhitespaceData extends IMXHXTagContentData {
 	/**
-		A text child inside of an element.
+		Gets the content of the whitespace.
 	**/
-	Text;
-
-	/**
-		A whitespace child inside of an element.
-	**/
-	Whitespace;
-
-	/**
-		A `<![CDATA[` block.
-	**/
-	CData;
-
-	/**
-		A `<!-- -->`comment block.
-	**/
-	Comment;
-
-	/**
-		A `<!--- -->` documentation comment block.
-	**/
-	DocComment;
-
-	/**
-		A `<!DOCTYPE>` tag
-	**/
-	Dtd;
+	var content(default, never):String;
 }

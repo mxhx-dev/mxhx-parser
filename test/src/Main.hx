@@ -16,6 +16,7 @@ class Main {
 		runner.addCase(new mxhx.parser.MXHXParserWhitespaceTest());
 		runner.addCase(new mxhx.parser.MXHXParserTagTest());
 		runner.addCase(new mxhx.parser.MXHXParserTagAttributeTest());
+		runner.addCase(new mxhx.parser.MXHXParserTagWhitespaceTest());
 
 		#if (html5 && playwright)
 		// special case: see below for details

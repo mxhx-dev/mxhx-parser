@@ -24,11 +24,12 @@ import mxhx.internal.MXHXData;
 import mxhx.internal.MXHXInstructionData;
 import mxhx.internal.MXHXTagAttributeData;
 import mxhx.internal.MXHXTagData;
+import mxhx.internal.MXHXTagWhitespaceData;
 import mxhx.internal.MXHXTextData;
 import mxhx.internal.MXHXUnitData;
 import mxhx.internal.parser.BalancingMXHXProcessor;
-import mxhx.parser.MXHXToken;
 import mxhx.internal.parser.hxparse.Parser;
+import mxhx.parser.MXHXToken;
 
 class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 	private var byteData:byte.ByteData;
@@ -49,6 +50,16 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 		var ts = new hxparse.LexerTokenSource(lexer, MXHXLexer.topLevel);
 		super(ts);
 	}
+
+	/**
+		By default, non-signifigant content, including DTD tokens and whitespace
+		tokens between tag attributes, is ignored. However, if
+		`includeNonSignificantContent` is set to `true`, they will be included.
+
+		This property is meant for editors and other environments that need to
+		preserve the document's original text.
+	**/
+	public var includeNonSignificantContent:Bool = false;
 
 	/**
 		Parses the MXHX string as `IMXHXData`.
@@ -110,7 +121,27 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				result.units.push(instructionData);
 			case TDtd(value):
 				junk();
-			// simply ignore the dtd token
+				// simply ignore the dtd token, unless specified
+				if (includeNonSignificantContent) {
+					var dtdData = new MXHXTextData(value, Dtd);
+					dtdData.setLocation(result, ++index);
+					dtdData.parentUnitIndex = depthStack[depthStack.length - 1];
+					var curPos = curPos();
+					dtdData.start = curPos.pmax - value.length;
+					dtdData.end = curPos.pmax;
+					var linePos = curPos.getLinePosition(byteData);
+					if (result.numUnits == 0) {
+						dtdData.line = 0;
+						dtdData.column = 0;
+					} else {
+						var prevUnit = result.units[result.numUnits - 1];
+						dtdData.line = prevUnit.endLine;
+						dtdData.column = prevUnit.endColumn;
+					}
+					dtdData.endLine = linePos.lineMax - 1;
+					dtdData.endColumn = linePos.posMax;
+					result.units.push(dtdData);
+				}
 			case TOpenTagStart(value):
 				junk();
 				if (depthStack.length == 1) {
@@ -136,10 +167,10 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				tagData.endColumn = linePos.posMax;
 				result.units.push(tagData);
 				stream.ruleset = MXHXLexer.tag;
-				var attributes:Array<IMXHXTagAttributeData> = [];
+				var tagContentItems:Array<IMXHXTagContentData> = [];
 				var prefixMap = new MutablePrefixMap();
-				tag(tagData, attributes, prefixMap);
-				tagData.attributeData = attributes;
+				tag(tagData, tagContentItems, prefixMap);
+				tagData.contentData = tagContentItems;
 				@:privateAccess result.prefixMapMap.set(tagData, prefixMap.toImmutable());
 				stream.ruleset = MXHXLexer.topLevel;
 				if (!tagData.isEmptyTag()) {
@@ -279,7 +310,7 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 		return true;
 	}
 
-	private function tag(tagData:MXHXTagData, ?attributes:Array<IMXHXTagAttributeData>, ?prefixMap:MutablePrefixMap):Void {
+	private function tag(tagData:MXHXTagData, ?tagContentItems:Array<IMXHXTagContentData>, ?prefixMap:MutablePrefixMap):Void {
 		var oldLexerPos = @:privateAccess lexer.pos;
 		if (peek(0) == null) {
 			// the tag is malformed, but we're going to keep going
@@ -294,10 +325,24 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 			return;
 		}
 		switch (peek(0)) {
-			case TWhitespace(_):
+			case TWhitespace(value):
 				junk();
-				// whitespace isn't significant, so ignore it
-				tag(tagData, attributes, prefixMap);
+				// whitespace isn't significant, so ignore it, unless specified
+				if (includeNonSignificantContent) {
+					var whitespace = new MXHXTagWhitespaceData(value);
+					whitespace.parentTag = tagData;
+					var curPos = curPos();
+					whitespace.start = curPos.pmax - value.length;
+					whitespace.end = curPos.pmax;
+					var linePos = curPos.getLinePosition(byteData);
+					whitespace.line = linePos.lineMin - 1;
+					whitespace.endLine = linePos.lineMax - 1;
+					whitespace.column = linePos.posMin;
+					whitespace.endColumn = linePos.posMax;
+					whitespace.source = result.source;
+					tagContentItems.push(whitespace);
+				}
+				tag(tagData, tagContentItems, prefixMap);
 			case TXmlns(value):
 				junk();
 				if (tagData.isCloseTag()) {
@@ -306,7 +351,7 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 					var linePos = curPos.getLinePosition(byteData);
 					result.problems.push(new MXHXParserProblem('${lexer.current} is not allowed here', 1510, Error, curPos.psource, curPos.pmin, curPos.pmax,
 						linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
-					tag(tagData, attributes, prefixMap);
+					tag(tagData, tagContentItems, prefixMap);
 					return;
 				}
 				var attributeData = new MXHXTagAttributeData(value);
@@ -322,7 +367,7 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				attributeData.endColumn = linePos.posMax;
 				attributeData.source = result.source;
 				attribute(attributeData);
-				attributes.push(attributeData);
+				tagContentItems.push(attributeData);
 
 				if (prefixMap != null) {
 					var prefix = "";
@@ -333,7 +378,7 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 					prefixMap.add(uri, prefix);
 				}
 
-				tag(tagData, attributes, prefixMap);
+				tag(tagData, tagContentItems, prefixMap);
 			case TName(value):
 				junk();
 				if (tagData.isCloseTag()) {
@@ -342,7 +387,7 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 					var linePos = curPos.getLinePosition(byteData);
 					result.problems.push(new MXHXParserProblem('${lexer.current} is not allowed here', 1510, Error, curPos.psource, curPos.pmin, curPos.pmax,
 						linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
-					tag(tagData, attributes, prefixMap);
+					tag(tagData, tagContentItems, prefixMap);
 					return;
 				}
 				var attributeData = new MXHXTagAttributeData(value);
@@ -358,14 +403,20 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				attributeData.endColumn = linePos.posMax;
 				attributeData.source = result.source;
 				attribute(attributeData);
-				if (Lambda.exists(attributes, other -> other.name == attributeData.name)) {
+				if (Lambda.exists(tagContentItems, other -> {
+					if ((other is IMXHXTagAttributeData)) {
+						var otherAttrData:IMXHXTagAttributeData = cast other;
+						return otherAttrData.name == attributeData.name;
+					}
+					return false;
+				})) {
 					result.problems.push(new MXHXParserProblem('Attribute \'${attributeData.shortName}\' bound to namespace \'${attributeData.uri}\' is already specified for element \'${tagData.name}\'. It will be ignored.',
 						1408, Error, curPos.psource, curPos.pmin, curPos.pmax, linePos.lineMin
 						- 1, linePos.posMin, linePos.lineMax
 						- 1, linePos.posMax));
 				}
-				attributes.push(attributeData);
-				tag(tagData, attributes, prefixMap);
+				tagContentItems.push(attributeData);
+				tag(tagData, tagContentItems, prefixMap);
 			case TTagEnd:
 				junk();
 				tagData.setExplicitCloseToken(true);

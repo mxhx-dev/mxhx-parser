@@ -20,7 +20,7 @@ package mxhx;
 /**
 	Represents an attribute of a tag in [MXHX](https://mxhx.dev).
 **/
-interface IMXHXTagAttributeData extends IMXHXSourceLocation {
+interface IMXHXTagAttributeData extends IMXHXTagContentData {
 	/**
 		Gets the complete name of this attribute, including optional prefix and
 		optional state name suffix, such as `"s:width.over"`.
@@ -61,11 +61,6 @@ interface IMXHXTagAttributeData extends IMXHXSourceLocation {
 		Returns `true` if this attribute has a value.
 	**/
 	var hasValue(default, never):Bool;
-
-	/**
-		Gets the tag that conatins this attribute.
-	**/
-	var parentTag(default, never):IMXHXTagData;
 
 	/**
 		Gets the starting offset of this attribute's value. If the attribute
