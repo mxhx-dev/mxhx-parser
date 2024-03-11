@@ -22,7 +22,7 @@ jobs:
         run: |
           haxelib install utest --quiet
           haxelib install hxparse --quiet
-          haxelib dev mxhx-parser $GITHUB_WORKSPACE
+          haxelib dev mxhx-parser ${{ github.workspace }}
       - name: Run Interpreter Tests
         working-directory: test
         run: haxe test.hxml --interp

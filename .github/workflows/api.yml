@@ -19,7 +19,7 @@ jobs:
         run: |
           haxelib install dox --quiet
           haxelib install hxparse --quiet
-          haxelib dev mxhx-parser $GITHUB_WORKSPACE
+          haxelib dev mxhx-parser ${{ github.workspace }}
       - name: Build API reference
         working-directory: docs
         run: haxe docs.hxml
