@@ -410,7 +410,11 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 					}
 					return false;
 				})) {
-					result.problems.push(new MXHXParserProblem('Attribute \'${attributeData.shortName}\' bound to namespace \'${attributeData.uri}\' is already specified for element \'${tagData.name}\'. It will be ignored.',
+					var ns = "";
+					if (attributeData.uri != null) {
+						ns = attributeData.uri;
+					}
+					result.problems.push(new MXHXParserProblem('Attribute \'${attributeData.shortName}\' bound to namespace \'${ns}\' is already specified for element \'${tagData.name}\'. It will be ignored.',
 						1408, Error, curPos.psource, curPos.pmin, curPos.pmax, linePos.lineMin
 						- 1, linePos.posMin, linePos.lineMax
 						- 1, linePos.posMax));
