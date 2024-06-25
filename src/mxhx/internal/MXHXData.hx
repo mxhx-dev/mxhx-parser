@@ -152,6 +152,22 @@ class MXHXData implements IMXHXData {
 		return null;
 	}
 
+	/**
+		Inserts a prefix and URI mapping to the `MXHXData`, but it does so
+		without inserting `xmlns` attributes. Intended for advanced tooling that
+		manipulates `MXHXData` and parsable MXHX code.
+	**/
+	public function addToPrefixMapForTag(tagData:IMXHXTagData, uri:String, prefix:String, onlyIfUnique:Bool = false):Void {
+		var prefixMap = prefixMapMap.get(tagData);
+		if (prefixMap == null) {
+			prefixMap = new PrefixMap();
+			prefixMapMap.set(tagData, prefixMap);
+		}
+		var mutablePrefixMap = prefixMap.toMutable();
+		mutablePrefixMap.add(uri, prefix, onlyIfUnique);
+		prefixMapMap.set(tagData, mutablePrefixMap.toImmutable());
+	}
+
 	@:dox(hide)
 	public function toString():String {
 		var result = "";
