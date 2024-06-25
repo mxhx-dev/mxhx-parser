@@ -82,4 +82,9 @@ interface IMXHXData {
 		`findTagOrSurroundingTagContainingOffset()` instead.
 	**/
 	function findTagContainingOffset(offset:Int):IMXHXTagData;
+
+	/**
+		Creates a copy of the MXHX data.
+	**/
+	function clone():IMXHXData;
 }

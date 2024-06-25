@@ -89,4 +89,9 @@ interface IMXHXUnitData extends IMXHXSourceLocation {
 		where a corresponding close has not also been found.
 	**/
 	function getContainingTag(offset:Int):IMXHXTagData;
+
+	/**
+		Creates a copy of the unit data.
+	**/
+	function clone():IMXHXUnitData;
 }

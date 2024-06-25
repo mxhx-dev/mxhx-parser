@@ -20,16 +20,11 @@ package mxhx.internal;
 /**
 	Represents tag whitespace in [MXHX](https://mxhx.dev).
 **/
-class MXHXTagWhitespaceData extends MXHXSourceLocation implements IMXHXTagWhitespaceData {
+class MXHXTagWhitespaceData extends MXHXTagContentData implements IMXHXTagWhitespaceData {
 	/**
 		@see `mxhx.IMXHXTextData.content`
 	**/
 	public var content(default, default):String = null;
-
-	/**
-		@see `mxhx.IMXHXTagAttributeData.parentTag`
-	**/
-	public var parentTag(default, default):IMXHXTagData;
 
 	/**
 		Creates a new `MXHXTagAttributeData` object with the given arguments.
@@ -37,5 +32,11 @@ class MXHXTagWhitespaceData extends MXHXSourceLocation implements IMXHXTagWhites
 	public function new(?content:String) {
 		super();
 		this.content = content;
+	}
+
+	override public function clone():MXHXTagWhitespaceData {
+		var cloned = new MXHXTagWhitespaceData(content);
+		cloned.parentTag = parentTag;
+		return cloned;
 	}
 }

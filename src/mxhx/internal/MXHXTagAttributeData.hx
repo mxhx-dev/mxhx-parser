@@ -20,7 +20,7 @@ package mxhx.internal;
 /**
 	Represents a tag attribute in [MXHX](https://mxhx.dev).
 **/
-class MXHXTagAttributeData extends MXHXSourceLocation implements IMXHXTagAttributeData {
+class MXHXTagAttributeData extends MXHXTagContentData implements IMXHXTagAttributeData {
 	/**
 		@see `mxhx.IMXHXTagAttributeData.name`
 	**/
@@ -155,16 +155,18 @@ class MXHXTagAttributeData extends MXHXSourceLocation implements IMXHXTagAttribu
 	}
 
 	/**
-		@see `mxhx.IMXHXTagAttributeData.parentTag`
-	**/
-	public var parentTag(default, default):IMXHXTagData;
-
-	/**
 		Creates a new `MXHXTagAttributeData` object with the given arguments.
 	**/
 	public function new(?name:String) {
 		super();
 		this.name = name;
+	}
+
+	override public function clone():MXHXTagAttributeData {
+		var cloned = new MXHXTagAttributeData(name);
+		cloned.parentTag = parentTag;
+		cloned.setValueIncludingDelimeters(valueIncludingDelimiters);
+		return cloned;
 	}
 
 	override public function toString():String {

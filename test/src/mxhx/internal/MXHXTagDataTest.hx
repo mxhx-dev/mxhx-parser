@@ -14,6 +14,9 @@ class MXHXTagDataTest extends Test {
 		Assert.equals("", tag.prefix);
 		Assert.isNull(tag.stateName);
 		Assert.isNull(tag.uri);
+		Assert.isTrue(tag.isOpenTag());
+		Assert.isFalse(tag.isCloseTag());
+		Assert.isFalse(tag.isEmptyTag());
 	}
 
 	public function testOpenTagNameWithPrefix():Void {
@@ -24,6 +27,9 @@ class MXHXTagDataTest extends Test {
 		Assert.equals("p", tag.prefix);
 		Assert.isNull(tag.stateName);
 		Assert.isNull(tag.uri);
+		Assert.isTrue(tag.isOpenTag());
+		Assert.isFalse(tag.isCloseTag());
+		Assert.isFalse(tag.isEmptyTag());
 	}
 
 	public function testOpenTagNameWithState():Void {
@@ -34,6 +40,9 @@ class MXHXTagDataTest extends Test {
 		Assert.equals("", tag.prefix);
 		Assert.equals("state", tag.stateName);
 		Assert.isNull(tag.uri);
+		Assert.isTrue(tag.isOpenTag());
+		Assert.isFalse(tag.isCloseTag());
+		Assert.isFalse(tag.isEmptyTag());
 	}
 
 	public function testOpenTagNameWithPrefixAndState():Void {
@@ -44,6 +53,9 @@ class MXHXTagDataTest extends Test {
 		Assert.equals("p", tag.prefix);
 		Assert.equals("state", tag.stateName);
 		Assert.isNull(tag.uri);
+		Assert.isTrue(tag.isOpenTag());
+		Assert.isFalse(tag.isCloseTag());
+		Assert.isFalse(tag.isEmptyTag());
 	}
 
 	public function testCloseTagName():Void {
@@ -54,6 +66,9 @@ class MXHXTagDataTest extends Test {
 		Assert.equals("p", tag.prefix);
 		Assert.isNull(tag.stateName);
 		Assert.isNull(tag.uri);
+		Assert.isFalse(tag.isOpenTag());
+		Assert.isTrue(tag.isCloseTag());
+		Assert.isFalse(tag.isEmptyTag());
 	}
 
 	public function testIsOpenTag():Void {
@@ -61,6 +76,7 @@ class MXHXTagDataTest extends Test {
 		tag.init("<p:Tag");
 		Assert.isTrue(tag.isOpenTag());
 		Assert.isFalse(tag.isCloseTag());
+		Assert.isFalse(tag.isEmptyTag());
 	}
 
 	public function testIsCloseTag():Void {
@@ -68,6 +84,7 @@ class MXHXTagDataTest extends Test {
 		tag.init("</p:Tag");
 		Assert.isFalse(tag.isOpenTag());
 		Assert.isTrue(tag.isCloseTag());
+		Assert.isFalse(tag.isEmptyTag());
 	}
 
 	public function testEmptyTag():Void {
@@ -295,5 +312,59 @@ class MXHXTagDataTest extends Test {
 
 		Assert.equals(outerOpenTag, outerCloseTag.findMatchingOpenTag());
 		Assert.equals(innerOpenTag, innerCloseTag.findMatchingOpenTag());
+	}
+
+	public function testCloneTagData():Void {
+		var mxhxData = new MXHXData(SOURCE);
+
+		var rootTag = new MXHXTagData();
+		rootTag.init("<RootTag");
+		rootTag.setLocation(mxhxData, 0);
+		rootTag.setOffsets(0, 26);
+		mxhxData.units.push(rootTag);
+
+		var tag = new MXHXTagData();
+		tag.init("<p:tag.state");
+		tag.setLocation(mxhxData, 1);
+		tag.setOffsets(26, 36);
+		tag.parentUnitIndex = 0;
+		mxhxData.units.push(tag);
+
+		var attr = new MXHXTagAttributeData();
+		attr.name = "p:attr.state";
+		attr.setValueIncludingDelimeters("\"123.4\"");
+		attr.parentTag = tag;
+		tag.attributeData = [attr];
+
+		var clonedTag = tag.clone();
+		Assert.notNull(clonedTag);
+		Assert.notEquals(tag, clonedTag);
+		Assert.equals("p:tag.state", clonedTag.name);
+		Assert.equals("tag", clonedTag.shortName);
+		Assert.equals("p", clonedTag.prefix);
+		Assert.equals("state", clonedTag.stateName);
+		Assert.isNull(clonedTag.uri);
+		Assert.equals(SOURCE, clonedTag.source);
+		Assert.isTrue(clonedTag.isOpenTag());
+		Assert.isFalse(clonedTag.isCloseTag());
+		Assert.isFalse(clonedTag.isEmptyTag());
+		Assert.equals(1, clonedTag.index);
+		Assert.equals(0, clonedTag.parentUnitIndex);
+		Assert.equals(26, clonedTag.start);
+		Assert.equals(36, clonedTag.end);
+		Assert.equals(mxhxData, clonedTag.parent);
+		Assert.equals(rootTag, clonedTag.parentTag);
+
+		var clonedAttr = clonedTag.getAttributeData(attr.name);
+		Assert.notNull(clonedAttr);
+		Assert.notEquals(attr, clonedAttr);
+		Assert.equals(clonedTag, clonedAttr.parentTag);
+		Assert.equals("p:attr.state", clonedAttr.name);
+		Assert.equals("attr", clonedAttr.shortName);
+		Assert.equals("p", clonedAttr.prefix);
+		Assert.equals("state", clonedAttr.stateName);
+		Assert.isNull(clonedAttr.uri);
+		Assert.isTrue(clonedAttr.hasValue);
+		Assert.equals("123.4", clonedAttr.rawValue);
 	}
 }

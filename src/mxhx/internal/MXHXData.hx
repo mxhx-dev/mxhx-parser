@@ -163,6 +163,19 @@ class MXHXData implements IMXHXData {
 	}
 
 	/**
+		@see `mxhx.IMXHXData.clone()`
+	**/
+	public function clone():MXHXData {
+		var cloned = new MXHXData(source);
+		cloned.units = units.map(unit -> {
+			var clonedUnit = (cast unit.clone() : MXHXUnitData);
+			clonedUnit.parent = cloned;
+			return (cast clonedUnit : IMXHXUnitData);
+		});
+		return cloned;
+	}
+
+	/**
 		If the offset is contained within an MXHX unit, get that unit. If it's
 		not, then get the first unit that follows the offset.
 	**/

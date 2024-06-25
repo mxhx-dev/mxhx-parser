@@ -15,19 +15,25 @@
 	limitations under the License.
  */
 
-package mxhx;
+package mxhx.internal;
 
 /**
-	Represents a content of a tag in [MXHX](https://mxhx.dev).
+	Represents tag content in [MXHX](https://mxhx.dev).
 **/
-interface IMXHXTagContentData extends IMXHXSourceLocation {
+class MXHXTagContentData extends MXHXSourceLocation implements IMXHXTagContentData {
 	/**
-		Gets the tag that conatins this attribute.
+		@see `mxhx.IMXHXTagAttributeData.parentTag`
 	**/
-	var parentTag(default, never):IMXHXTagData;
+	public var parentTag(default, default):IMXHXTagData;
+
+	private function new() {
+		super();
+	}
 
 	/**
-		Creates a copy of the tag content data.
+		@see `mxhx.IMXHXTagContentData.clone()`
 	**/
-	function clone():IMXHXTagContentData;
+	public function clone():IMXHXTagContentData {
+		throw "Not implemented";
+	}
 }

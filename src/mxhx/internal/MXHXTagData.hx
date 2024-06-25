@@ -224,7 +224,11 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 		closeTag = other.closeTag;
 		emptyTag = other.emptyTag;
 		explicitCloseToken = other.explicitCloseToken;
-		attributeMap = other.attributeMap.copy();
+		contentData = other.contentData.map(data -> {
+			var cloned = (cast data.clone() : MXHXTagContentData);
+			cloned.parentTag = this;
+			return (cast cloned : IMXHXTagContentData);
+		});
 		setOffsets(other.start, other.end);
 	}
 
@@ -425,6 +429,14 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 			}
 			nextTag = nextTag.getNextTag();
 		}
+	}
+
+	override public function clone():MXHXTagData {
+		var cloned = new MXHXTagData();
+		cloned.setLocation(parent, index);
+		cloned.parentUnitIndex = parentUnitIndex;
+		cloned.copyFrom(this);
+		return cloned;
 	}
 
 	override public function toString():String {

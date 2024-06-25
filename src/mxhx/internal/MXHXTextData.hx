@@ -47,6 +47,14 @@ class MXHXTextData extends MXHXUnitData implements IMXHXTextData {
 		return '$textType "${escapedContent()}" ${super.toString()}';
 	}
 
+	override public function clone():MXHXTextData {
+		var cloned = new MXHXTextData(content, textType);
+		cloned.setLocation(parent, index);
+		cloned.parentUnitIndex = parentUnitIndex;
+		cloned.setOffsets(start, end);
+		return cloned;
+	}
+
 	private function escapedContent():String {
 		if (content == null) {
 			return "";

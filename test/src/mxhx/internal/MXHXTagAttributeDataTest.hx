@@ -64,4 +64,27 @@ class MXHXTagAttributeDataTest extends Test {
 		Assert.equals(6, attr.valueStart);
 		Assert.equals(11, attr.valueEnd);
 	}
+
+	public function testCloneTagAttributeData():Void {
+		var parentTag = new MXHXTagData();
+		parentTag.init("<ParentTag");
+
+		var attr = new MXHXTagAttributeData();
+		attr.name = "p:attr.state";
+		attr.setValueIncludingDelimeters("\"123.4\"");
+		attr.parentTag = parentTag;
+		parentTag.attributeData = [attr];
+
+		var clonedAttribute = attr.clone();
+		Assert.notNull(clonedAttribute);
+		Assert.notEquals(attr, clonedAttribute);
+		Assert.equals("p:attr.state", clonedAttribute.name);
+		Assert.equals("attr", clonedAttribute.shortName);
+		Assert.equals("p", clonedAttribute.prefix);
+		Assert.equals("state", clonedAttribute.stateName);
+		Assert.isNull(clonedAttribute.uri);
+		Assert.isTrue(clonedAttribute.hasValue);
+		Assert.equals("123.4", clonedAttribute.rawValue);
+		Assert.equals(parentTag, clonedAttribute.parentTag);
+	}
 }

@@ -176,4 +176,11 @@ class MXHXUnitData extends MXHXSourceLocation implements IMXHXUnitData {
 
 		return containingTag;
 	}
+
+	/**
+		@see `mxhx.IMXHXUnitData.clone()`
+	**/
+	public function clone():IMXHXUnitData {
+		throw "Not implemented";
+	}
 }

@@ -67,6 +67,14 @@ class MXHXInstructionData extends MXHXUnitData implements IMXHXInstructionData {
 		this.instructionText = instructionText;
 	}
 
+	override public function clone():MXHXInstructionData {
+		var cloned = new MXHXInstructionData(instructionText);
+		cloned.setLocation(parent, index);
+		cloned.parentUnitIndex = parentUnitIndex;
+		cloned.setOffsets(start, end);
+		return cloned;
+	}
+
 	override public function toString():String {
 		return '<?$target ${escapedContent()}?> ${super.toString()}';
 	}

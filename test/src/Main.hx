@@ -4,8 +4,12 @@ import utest.ui.Report;
 class Main {
 	public static function main():Void {
 		var runner = new Runner();
-		runner.addCase(new mxhx.internal.MXHXTagDataTest());
+		runner.addCase(new mxhx.internal.MXHXInstructionDataTest());
+		runner.addCase(new mxhx.internal.MXHXTextDataTest());
 		runner.addCase(new mxhx.internal.MXHXTagAttributeDataTest());
+		runner.addCase(new mxhx.internal.MXHXTagWhitespaceDataTest());
+		runner.addCase(new mxhx.internal.MXHXTagDataTest());
+		runner.addCase(new mxhx.internal.MXHXDataTest());
 		runner.addCase(new mxhx.parser.MXHXParserTest());
 		runner.addCase(new mxhx.parser.MXHXParserCDataTest());
 		runner.addCase(new mxhx.parser.MXHXParserCommentTest());
