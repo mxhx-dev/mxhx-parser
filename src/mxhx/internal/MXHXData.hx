@@ -186,6 +186,13 @@ class MXHXData implements IMXHXData {
 		cloned.units = units.map(unit -> {
 			var clonedUnit = (cast unit.clone() : MXHXUnitData);
 			clonedUnit.parent = cloned;
+			if ((unit is IMXHXTagData)) {
+				var tag:IMXHXTagData = cast unit;
+				var prefixMap = prefixMapMap.get(tag);
+				if (prefixMap != null) {
+					cloned.prefixMapMap.set(cast clonedUnit, new PrefixMap(prefixMap));
+				}
+			}
 			return (cast clonedUnit : IMXHXUnitData);
 		});
 		return cloned;
