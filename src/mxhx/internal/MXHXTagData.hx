@@ -390,7 +390,9 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 		} else {
 			// This is a close tag.  Start at the corresponding open tag.
 			var openTag:IMXHXTagData = getContainingTag(start);
-			nextTag = openTag.getNextTag();
+			if (openTag != null) {
+				nextTag = openTag.getNextTag();
+			}
 		}
 		// Skip any text blocks to find the next actual tag.  If it's an open tag,
 		// that is our first child.  Otherwise it's a close tag, return null.
