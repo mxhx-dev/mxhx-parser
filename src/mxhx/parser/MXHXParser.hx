@@ -204,7 +204,14 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				tagData.endColumn = linePos.posMax;
 				result.units.push(tagData);
 				stream.ruleset = MXHXLexer.tag;
-				tag(tagData);
+				var tagContentItems:Array<IMXHXTagContentData> = null;
+				if (includeNonSignificantContent) {
+					tagContentItems = [];
+				}
+				tag(tagData, tagContentItems);
+				if (includeNonSignificantContent) {
+					tagData.contentData = tagContentItems;
+				}
 				stream.ruleset = MXHXLexer.topLevel;
 			case TCData(value):
 				junk();
