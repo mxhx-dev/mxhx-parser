@@ -311,8 +311,13 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				junk();
 				var curPos = curPos();
 				var linePos = curPos.getLinePosition(byteData);
-				result.problems.push(new MXHXParserProblem('Unexpected \'${peek(0)}\'', null, Error, curPos.psource, curPos.pmin, curPos.pmax,
-					linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+				var unexpectedToken = peek(0);
+				var unexpectedString:String = null;
+				if (unexpectedToken != null) {
+					unexpectedString = unexpectedToken.getName();
+				}
+				result.problems.push(new MXHXParserProblem('Unexpected token. \'${unexpectedString}\' is not allowed here', null, Error, curPos.psource,
+					curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 		};
 		return true;
 	}
@@ -551,8 +556,13 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				junk();
 				var curPos = curPos();
 				var linePos = curPos.getLinePosition(byteData);
-				result.problems.push(new MXHXParserProblem('Unexpected \'${peek(0)}\'', null, Error, curPos.psource, curPos.pmin, curPos.pmax,
-					linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+				var unexpectedToken = peek(0);
+				var unexpectedString:String = null;
+				if (unexpectedToken != null) {
+					unexpectedString = unexpectedToken.getName();
+				}
+				result.problems.push(new MXHXParserProblem('Unexpected token. \'${unexpectedString}\' is not allowed here', null, Error, curPos.psource,
+					curPos.pmin, curPos.pmax, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
 		}
 	}
 
