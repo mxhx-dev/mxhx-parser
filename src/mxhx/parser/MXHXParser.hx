@@ -482,6 +482,7 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 
 	private function attribute(attributeData:MXHXTagAttributeData):Void {
 		var oldLexerPos = @:privateAccess lexer.pos;
+		var attributeMissingValue = false;
 		switch (peek(0)) {
 			case TEquals:
 				junk();
@@ -491,19 +492,25 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 				attributeData.endLine = linePos.lineMax - 1;
 				attributeData.endColumn = linePos.posMax;
 				attributeData.setValueStartIncludingDelimiters(curPos.pmax);
+			case null:
+				attributeMissingValue = true;
 			default:
-				// the attribute is malformed, but we're going to keep going
-				var curPos = curPos();
-				var linePos = curPos.getLinePosition(byteData);
-				result.problems.push(new MXHXParserProblem('${attributeData.name} attribute is missing a value', 1510, Error, attributeData.source,
-					attributeData.start, curPos.pmin, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
-				attributeData.end = curPos.pmin;
-				attributeData.endLine = linePos.lineMin - 1;
-				attributeData.endColumn = linePos.posMin;
-				setLexerPos(oldLexerPos);
-				return;
+				attributeMissingValue = true;
+		}
+		if (attributeMissingValue) {
+			// the attribute is malformed, but we're going to keep going
+			var curPos = curPos();
+			var linePos = curPos.getLinePosition(byteData);
+			result.problems.push(new MXHXParserProblem('${attributeData.name} attribute is missing a value', 1510, Error, attributeData.source,
+				attributeData.start, curPos.pmin, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+			attributeData.end = curPos.pmin;
+			attributeData.endLine = linePos.lineMin - 1;
+			attributeData.endColumn = linePos.posMin;
+			setLexerPos(oldLexerPos);
+			return;
 		}
 		oldLexerPos = @:privateAccess lexer.pos;
+		var attributeValueInvalid = false;
 		switch (peek(0)) {
 			case TString(_):
 				junk();
@@ -515,15 +522,21 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 					string(attributeData, lexer.current);
 				}
 				stream.ruleset = MXHXLexer.tag;
+			case null:
+				attributeValueInvalid = true;
 			default:
-				// the attribute value is malformed, so create an error, but
-				// then we're going to continue parsing as if it were closed
-				var curPos = curPos();
-				var linePos = curPos.getLinePosition(byteData);
-				result.problems.push(new MXHXParserProblem('${attributeData.name} attribute is missing a value', 1510, Error, attributeData.source,
-					attributeData.start, curPos.pmin, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
-				attributeData.end = curPos.pmin;
-				setLexerPos(oldLexerPos);
+				attributeValueInvalid = true;
+		}
+		if (attributeValueInvalid) {
+			// the attribute value is malformed, so create an error, but
+			// then we're going to continue parsing as if it were closed
+			var curPos = curPos();
+			var linePos = curPos.getLinePosition(byteData);
+			result.problems.push(new MXHXParserProblem('${attributeData.name} attribute is missing a value', 1510, Error, attributeData.source,
+				attributeData.start, curPos.pmin, linePos.lineMin - 1, linePos.posMin, linePos.lineMax - 1, linePos.posMax));
+			attributeData.end = curPos.pmin;
+			setLexerPos(oldLexerPos);
+			return;
 		}
 	}
 
