@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  haxelib:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mxhx-parser-haxelib
+          path: |
+            src/
+            haxelib.json
+            README.md
+            LICENSE
+            NOTICE
+            CHANGELOG.md
+          if-no-files-found: error
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.3.4
+      - name: Set up Haxelib dependencies
+        run: |
+          haxelib install dox --quiet
+          haxelib install hxparse --quiet
+          haxelib dev mxhx-parser ${{ github.workspace }}
+      - name: Build API reference
+        working-directory: docs
+        run: haxe docs.hxml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mxhx-parser-docs
+          path: bin/api/
+          if-no-files-found: error
+  tests:
+    strategy:
+      matrix:
+        haxe-version: [4.0.5, 4.1.5, 4.2.5, 4.3.4]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: ${{ matrix.haxe-version }}
+      - uses: cedx/setup-hashlink@v3
+      - name: Set up Haxelib dependencies
+        run: |
+          haxelib install utest --quiet
+          haxelib install hxparse --quiet
+          haxelib dev mxhx-parser ${{ github.workspace }}
+      - name: Run Interpreter Tests
+        working-directory: test
+        run: haxe test.hxml --interp
+      - name: Run Neko Tests
+        working-directory: test
+        run: |
+          haxe test.hxml --neko bin/test.n
+          neko bin/test.n
+      - name: Run HashLink Tests
+        working-directory: test
+        run: |
+          haxe test.hxml --hl bin/test.hl
+          hl bin/test.hl
