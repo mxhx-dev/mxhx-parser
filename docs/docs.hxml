@@ -1,5 +1,4 @@
 -cp ../src
--lib hxparse
 -D doc_gen
 --macro include("mxhx")
 --no-output

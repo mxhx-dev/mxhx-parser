@@ -1,5 +1,4 @@
 --interp
 -cp src
 -cp src-dev
--lib hxparse
 --main Main

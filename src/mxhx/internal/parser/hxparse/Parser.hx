@@ -1,14 +1,4 @@
-/**
-	Copyright (c) 2021 Simon Krajewski
-
-	Copied from hxparse as a workaround for https://github.com/Simn/hxparse/issues/62
-**/
-
 package mxhx.internal.parser.hxparse;
-
-import hxparse.Unexpected;
-import hxparse.NoMatch;
-import hxparse.TokenSource;
 
 /**
 	Parser is the base class for all custom parsers.
@@ -16,9 +6,6 @@ import hxparse.TokenSource;
 	The intended usage is to extend it and utilize its method as an API where
 	required.
  */
-#if !macro
-@:generic
-#end
 @:dox(hide)
 class Parser<S:TokenSource<Token>, Token> {
 	/**
@@ -41,8 +28,7 @@ class Parser<S:TokenSource<Token>, Token> {
 	/**
 		Returns the `n`th token without consuming it.
 	**/
-	@:dox(show)
-	#if cs inline #end // Workaround for https://github.com/HaxeFoundation/haxe/issues/3212
+	@:dox(show) #if cs inline #end // Workaround for https://github.com/HaxeFoundation/haxe/issues/3212
 	function peek(n:Int):Token {
 		if (token == null) {
 			token = new haxe.ds.GenericStack.GenericCell<Token>(stream.token(), null);
@@ -92,7 +78,7 @@ class Parser<S:TokenSource<Token>, Token> {
 		while (true) {
 			try {
 				acc.push(f());
-			} catch (e:hxparse.NoMatch<Dynamic>) {
+			} catch (e:NoMatch<Dynamic>) {
 				break;
 			}
 			if (separatorFunc(peek(0))) {
@@ -112,7 +98,7 @@ class Parser<S:TokenSource<Token>, Token> {
 	function parseOptional<T>(f:Void->T) {
 		try {
 			return f();
-		} catch (e:hxparse.NoMatch<Dynamic>) {
+		} catch (e:NoMatch<Dynamic>) {
 			return null;
 		}
 	}
@@ -128,7 +114,7 @@ class Parser<S:TokenSource<Token>, Token> {
 		while (true) {
 			try {
 				acc.push(f());
-			} catch (e:hxparse.NoMatch<Dynamic>) {
+			} catch (e:NoMatch<Dynamic>) {
 				return acc;
 			}
 		}
@@ -158,18 +144,5 @@ class Parser<S:TokenSource<Token>, Token> {
 	**/
 	inline function unexpected():Dynamic {
 		throw new Unexpected(peek(0), stream.curPos());
-	}
-
-	/**
-		Macro that processes and returns the result of `switch`.
-	**/
-	@:access(hxparse.ParserBuilderImpl.transformSwitch)
-	static public macro function parse(e:haxe.macro.Expr) {
-		switch (e.expr) {
-			case ESwitch(_, cases, edef) | EParenthesis({expr: ESwitch(_, cases, edef)}):
-				return hxparse.ParserBuilderImpl.transformSwitch(cases, edef);
-			case _:
-				return haxe.macro.Context.error("Expected switch expression", e.pos);
-		}
 	}
 }

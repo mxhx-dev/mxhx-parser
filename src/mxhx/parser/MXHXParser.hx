@@ -18,8 +18,6 @@
 package mxhx.parser;
 
 import haxe.CallStack;
-import hxparse.Lexer;
-import hxparse.LexerTokenSource;
 import mxhx.internal.MXHXData;
 import mxhx.internal.MXHXInstructionData;
 import mxhx.internal.MXHXTagAttributeData;
@@ -28,11 +26,14 @@ import mxhx.internal.MXHXTagWhitespaceData;
 import mxhx.internal.MXHXTextData;
 import mxhx.internal.MXHXUnitData;
 import mxhx.internal.parser.BalancingMXHXProcessor;
+import mxhx.internal.parser.hxparse.ByteData;
+import mxhx.internal.parser.hxparse.Lexer;
+import mxhx.internal.parser.hxparse.LexerTokenSource;
 import mxhx.internal.parser.hxparse.Parser;
 import mxhx.parser.MXHXToken;
 
 class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
-	private var byteData:byte.ByteData;
+	private var byteData:ByteData;
 	private var lexer:MXHXLexer;
 	private var index:Int = -1;
 	private var balancingIndex:Int = 0;
@@ -45,9 +46,9 @@ class MXHXParser extends Parser<LexerTokenSource<MXHXToken>, MXHXToken> {
 		Creates a new `MXHXParser` object with the given arguments.
 	**/
 	public function new(input:String, sourcePath:String) {
-		byteData = byte.ByteData.ofString(input);
+		byteData = ByteData.ofString(input);
 		lexer = new MXHXLexer(byteData, sourcePath);
-		var ts = new hxparse.LexerTokenSource(lexer, MXHXLexer.topLevel);
+		var ts = new LexerTokenSource(lexer, MXHXLexer.topLevel);
 		super(ts);
 	}
 
@@ -616,7 +617,7 @@ private class MXHXLexer extends Lexer {
 
 	public var problems(default, never):Array<MXHXParserProblem> = [];
 
-	public function new(input:byte.ByteData, sourceName:String = "<null>") {
+	public function new(input:ByteData, sourceName:String = "<null>") {
 		super(input, sourceName);
 	}
 
