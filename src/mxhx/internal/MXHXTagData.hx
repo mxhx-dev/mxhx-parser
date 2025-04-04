@@ -230,6 +230,10 @@ class MXHXTagData extends MXHXUnitData implements IMXHXTagData {
 			return (cast cloned : IMXHXTagContentData);
 		});
 		setOffsets(other.start, other.end);
+		line = other.line;
+		column = other.column;
+		endLine = other.endLine;
+		endColumn = other.endColumn;
 	}
 
 	/**

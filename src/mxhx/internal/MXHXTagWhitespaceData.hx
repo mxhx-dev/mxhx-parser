@@ -37,6 +37,12 @@ class MXHXTagWhitespaceData extends MXHXTagContentData implements IMXHXTagWhites
 	override public function clone():MXHXTagWhitespaceData {
 		var cloned = new MXHXTagWhitespaceData(content);
 		cloned.parentTag = parentTag;
+		cloned.start = start;
+		cloned.end = end;
+		cloned.line = line;
+		cloned.column = column;
+		cloned.endLine = endLine;
+		cloned.endColumn = endColumn;
 		return cloned;
 	}
 }

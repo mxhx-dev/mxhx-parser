@@ -73,6 +73,12 @@ class MXHXTagAttributeDataTest extends Test {
 		attr.name = "p:attr.state";
 		attr.setValueIncludingDelimeters("\"123.4\"");
 		attr.parentTag = parentTag;
+		attr.start = 11;
+		attr.end = 31;
+		attr.line = 0;
+		attr.column = 11;
+		attr.endLine = 0;
+		attr.endColumn = 31;
 		parentTag.attributeData = [attr];
 
 		var clonedAttribute = attr.clone();
@@ -86,5 +92,11 @@ class MXHXTagAttributeDataTest extends Test {
 		Assert.isTrue(clonedAttribute.hasValue);
 		Assert.equals("123.4", clonedAttribute.rawValue);
 		Assert.equals(parentTag, clonedAttribute.parentTag);
+		Assert.equals(11, clonedAttribute.start);
+		Assert.equals(31, clonedAttribute.end);
+		Assert.equals(0, clonedAttribute.line);
+		Assert.equals(11, clonedAttribute.column);
+		Assert.equals(0, clonedAttribute.endLine);
+		Assert.equals(31, clonedAttribute.endColumn);
 	}
 }

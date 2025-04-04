@@ -52,6 +52,10 @@ class MXHXTextData extends MXHXUnitData implements IMXHXTextData {
 		cloned.setLocation(parent, index);
 		cloned.parentUnitIndex = parentUnitIndex;
 		cloned.setOffsets(start, end);
+		cloned.line = line;
+		cloned.column = column;
+		cloned.endLine = endLine;
+		cloned.endColumn = endColumn;
 		return cloned;
 	}
 

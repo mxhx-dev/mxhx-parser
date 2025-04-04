@@ -166,6 +166,12 @@ class MXHXTagAttributeData extends MXHXTagContentData implements IMXHXTagAttribu
 		var cloned = new MXHXTagAttributeData(name);
 		cloned.parentTag = parentTag;
 		cloned.setValueIncludingDelimeters(valueIncludingDelimiters);
+		cloned.start = start;
+		cloned.end = end;
+		cloned.line = line;
+		cloned.column = column;
+		cloned.endLine = endLine;
+		cloned.endColumn = endColumn;
 		return cloned;
 	}
 
